@@ -1,168 +1,244 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Search, ShoppingCart, Heart, User, Globe, Menu, X } from 'lucide-react';
+import React, { useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { usePathname } from "next/navigation";
+import {
+  Search,
+  ShoppingCart,
+  User,
+  Menu,
+  X,
+  ChevronDown,
+  Sparkles,
+  Code2,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import Logo from "../assets/Logo.png";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { cn } from "@/lib/utils";
 
 const Navbar = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [cartItems, setCartItems] = useState(3);
+  const pathname = usePathname();
 
   const categories = [
-    'Electronics',
-    'Fashion',
-    'Home & Kitchen',
-    'Beauty',
-    'Sports',
-    'Books',
-    'Toys',
+    { name: "Home", href: "/" },
+    { name: "Electronics", href: "/electronics" },
+    { name: "Fashion", href: "/fashion" },
+    { name: "Jewelry", href: "/jewelry" },
+    { name: "Premium", href: "/premium" },
+    { name: "Our Developers", href: "/developers", icon: Code2 },
   ];
 
+  // Function to check if a link is active
+  const isActiveLink = (href: string) => {
+    if (href === "/") {
+      return pathname === "/";
+    }
+    return pathname.startsWith(href);
+  };
+
   return (
-    <nav className="bg-white shadow-md">
-      {/* Top Nav */}
-      <div className="border-b border-gray-200">
-        <div className="container mx-auto px-4 py-2 flex justify-between items-center">
-          <div className="text-xl font-bold text-gray-800">AllMartAvenue</div>
-          
-          <div className="flex items-center space-x-4">
-            <div className="hidden md:flex items-center space-x-2">
-              <Globe className="h-5 w-5 text-gray-600" />
-              <select className="bg-transparent text-sm focus:outline-none">
-                <option>EN</option>
-                <option>ES</option>
-                <option>FR</option>
-              </select>
-            </div>
-            
-            <button className="relative p-2">
-              <Heart className="h-5 w-5 text-gray-600 hover:text-[#007873] transition-colors" />
-            </button>
-            
-            <button className="relative p-2">
-              <User className="h-5 w-5 text-gray-600 hover:text-[#007873] transition-colors" />
-            </button>
-            
-            <button className="relative p-2">
-              <ShoppingCart className="h-5 w-5 text-gray-600 hover:text-[#007873] transition-colors" />
-              <span className="absolute -top-1 -right-1 bg-[#007873] text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
-                3
-              </span>
-            </button>
+    <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      {/* Mobile Search Panel */}
+      <div
+        className={cn(
+          "absolute top-full left-0 right-0 bg-white border-b shadow-lg transition-all duration-300 overflow-hidden",
+          isSearchOpen ? "max-h-20 opacity-100" : "max-h-0 opacity-0"
+        )}
+      >
+        <div className="container mx-auto px-4 py-3">
+          <div className="relative flex items-center">
+            <Search className="absolute left-3 h-4 w-4 text-muted-foreground" />
+            <Input
+              type="search"
+              placeholder="Search products..."
+              className="w-full pl-9 pr-12"
+              autoFocus
+            />
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute right-1"
+              onClick={() => setIsSearchOpen(false)}
+            >
+              <X className="h-4 w-4" />
+            </Button>
           </div>
         </div>
       </div>
 
-      {/* Bottom Nav */}
-      <div className="container mx-auto px-4 py-3">
-        <div className="flex items-center justify-between">
-          {/* Categories Dropdown */}
-          <div className="hidden md:block relative">
-            <button 
-              className="flex items-center space-x-1 text-gray-700 hover:text-[#007873] transition-colors font-medium"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-            >
-              <span>Categories</span>
-              <motion.span
-                animate={{ rotate: isMenuOpen ? 180 : 0 }}
-                transition={{ duration: 0.2 }}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </motion.span>
-            </button>
-
-            <AnimatePresence>
-              {isMenuOpen && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.2 }}
-                  className="absolute z-50 top-full left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1"
-                >
-                  {categories.map((category) => (
-                    <a
-                      key={category}
-                      href="#"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-[#007873]"
-                    >
-                      {category}
-                    </a>
-                  ))}
-                </motion.div>
-              )}
-            </AnimatePresence>
+      <div className="container mx-auto px-4">
+        {/* Main navigation */}
+        <div className="flex h-16 items-center justify-between">
+          {/* Logo and mobile menu */}
+          <div className="flex items-center gap-4">
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="md:hidden">
+                  <Menu className="h-5 w-5" />
+                  <span className="sr-only">Toggle menu</span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-[300px] sm:w-[400px]">
+                <div className="flex flex-col gap-6 py-6">
+                  <Link
+                    href="/"
+                    className="flex items-center gap-2 text-lg font-bold"
+                  >
+                    <div className="h-8 w-8 bg-primary rounded-md flex items-center justify-center">
+                      <Sparkles className="h-5 w-5 text-white" />
+                    </div>
+                    <span>AllMart Avenue</span>
+                  </Link>
+                  <div className="flex flex-col gap-4">
+                    {categories.map((category) => {
+                      const isActive = isActiveLink(category.href);
+                      const IconComponent = category.icon;
+                      return (
+                        <Link
+                          key={category.name}
+                          href={category.href}
+                          className={cn(
+                            "text-sm font-medium transition-colors group flex items-center",
+                            isActive
+                              ? "text-[#007873]"
+                              : "hover:text-[#007873]"
+                          )}
+                        >
+                          <span
+                            className={cn(
+                              "w-2 h-2 bg-[#007873] rounded-full transition-opacity mr-2",
+                              isActive ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+                            )}
+                          ></span>
+                          {IconComponent && <IconComponent className="h-4 w-4 mr-2" />}
+                          {category.name}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
+              </SheetContent>
+            </Sheet>
+            <Link href="/" className="flex items-center space-x-2">
+              <div className="h-8 w-8 bg-gradient-to-br from-primary to-[#007873] rounded-md flex items-center justify-center">
+                <Image
+                  src={Logo}
+                  alt="AllMart Avenue Logo"
+                  width={32}
+                  height={32}
+                  className="rounded-md"
+                />
+              </div>
+              <span className="font-bold text-xl hidden sm:inline-block">
+                AllMart Avenue
+              </span>
+            </Link>
           </div>
 
-          {/* Mobile Menu Button */}
-          <button
-            className="md:hidden p-2"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          >
-            {isMenuOpen ? (
-              <X className="h-6 w-6 text-gray-600" />
-            ) : (
-              <Menu className="h-6 w-6 text-gray-600" />
-            )}
-          </button>
+          {/* Desktop categories */}
+          <div className="hidden md:flex items-center gap-6">
+            {categories.map((category) => {
+              const isActive = isActiveLink(category.href);
+              const IconComponent = category.icon;
+              return (
+                <Link
+                  key={category.name}
+                  href={category.href}
+                  className={cn(
+                    "text-sm font-medium transition-colors relative group flex items-center gap-1",
+                    isActive
+                      ? "text-[#007873]"
+                      : "hover:text-[#007873]"
+                  )}
+                >
+                  {IconComponent && <IconComponent className="h-4 w-4" />}
+                  {category.name}
+                  <span
+                    className={cn(
+                      "absolute -bottom-1 left-0 h-0.5 bg-[#007873] transition-all",
+                      isActive ? "w-full" : "w-0 group-hover:w-full"
+                    )}
+                  ></span>
+                </Link>
+              );
+            })}
+          </div>
 
-          {/* Search Bar */}
-          <div className="flex-1 max-w-2xl mx-4">
-            <div className="relative">
-              <input
-                type="text"
+          {/* Desktop Search bar */}
+          <div className="hidden md:flex flex-1 max-w-md">
+            <div className="relative w-full">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="search"
                 placeholder="Search products..."
-                className="w-full py-2 pl-4 pr-10 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#007873] focus:border-[#007873]"
+                className="w-full pl-9"
               />
-              <button className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1">
-                <Search className="h-5 w-5 text-gray-500 hover:text-[#007873] transition-colors" />
-              </button>
             </div>
           </div>
 
-          {/* Placeholder for alignment */}
-          <div className="md:hidden w-6" />
-        </div>
-
-        {/* Mobile Menu */}
-        <AnimatePresence>
-          {isMenuOpen && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.2 }}
-              className="md:hidden mt-4 bg-white rounded-md shadow-md overflow-hidden"
+          {/* Right side icons */}
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="md:hidden"
+              onClick={() => setIsSearchOpen(!isSearchOpen)}
             >
-              <div className="px-4 py-2 border-b border-gray-200 font-medium text-gray-700">
-                Categories
-              </div>
-              {categories.map((category) => (
-                <a
-                  key={category}
-                  href="#"
-                  className="block px-4 py-3 text-gray-700 hover:bg-gray-100 hover:text-[#007873] transition-colors"
-                >
-                  {category}
-                </a>
-              ))}
-              <div className="px-4 py-3 border-t border-gray-200">
-                <div className="flex items-center space-x-4 justify-center">
-                  <button className="flex items-center space-x-1 text-gray-600 hover:text-[#007873]">
-                    <User className="h-4 w-4" />
-                    <span>Login</span>
-                  </button>
-                  <button className="flex items-center space-x-1 text-gray-600 hover:text-[#007873]">
-                    <Heart className="h-4 w-4" />
-                    <span>Wishlist</span>
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+              <Search className="h-5 w-5" />
+              <span className="sr-only">Search</span>
+            </Button>
+
+            <Button variant="ghost" size="icon" className="relative">
+              <ShoppingCart className="h-5 w-5" />
+              {cartItems > 0 && (
+                <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-primary text-xs text-primary-foreground flex items-center justify-center">
+                  {cartItems}
+                </span>
+              )}
+              <span className="sr-only">Cart</span>
+            </Button>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <User className="h-5 w-5" />
+                  <span className="sr-only">Account</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>
+                  <User className="h-4 w-4 mr-2" />
+                  Profile
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <ShoppingCart className="h-4 w-4 mr-2" />
+                  Orders
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="text-destructive">
+                  <X className="h-4 w-4 mr-2" />
+                  Sign out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
       </div>
     </nav>
   );
