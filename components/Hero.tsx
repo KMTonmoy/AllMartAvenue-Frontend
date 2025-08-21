@@ -128,8 +128,9 @@ const Hero = () => {
             onClick={() => goToSlide(index)}
             aria-label={`Go to slide ${index + 1}`}
           />
+          
         ))}
-      </div>
+      </div> 
 
       {/* Bottom Controls Container (Bottom Right) */}
       <div className="absolute bottom-6 right-6 z-20 flex items-center space-x-4">
