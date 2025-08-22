@@ -1,0 +1,66 @@
+[
+  {
+    "id": 1,
+    "name": "Samsung Galaxy S24 Ultra",
+    "rating": 4.7,
+    "details": "200MP Camera, Snapdragon 8 Gen 3, 12GB RAM, 256GB Storage",
+    "price": "145000",
+    "originalPrice": "160000",
+    "discount": 9,
+    "category": "Smartphone",
+    "productTag": "special-offer",
+    "images": [
+      "samsung-s24-front.jpg",
+      "samsung-s24-back.jpg",
+      "samsung-s24-side.jpg"
+    ],
+    "video": "https://www.youtube.com/watch?v=samsung-official",
+    "startTime": "2025-08-22T08:00:00Z",
+    "endTime": "2025-08-22T20:00:00Z"
+  },
+  {
+    "id": 2,
+    "name": "iPhone 15 Pro Max",
+    "rating": 4.8,
+    "details": "A17 Pro chip, Titanium design, 48MP Main camera, 256GB",
+    "price": "150000",
+    "originalPrice": "165000",
+    "discount": 12,
+    "category": "Smartphone",
+    "productTag": "special-offer",
+    "images": ["iphone15-front.jpg", "iphone15-back.jpg"],
+    "video": "https://www.youtube.com/watch?v=iphone15-official",
+    "startTime": "2025-08-22T09:00:00Z",
+    "endTime": "2025-08-22T21:00:00Z"
+  },
+  {
+    "id": 3,
+    "name": "Sony WH-1000XM5",
+    "rating": 4.9,
+    "details": "Industry-leading noise canceling wireless headphones",
+    "price": "29999",
+    "originalPrice": "35000",
+    "discount": 20,
+    "category": "Audio",
+    "productTag": "special-offer",
+    "images": ["sony-wh1000xm5.jpg"],
+    "video": "https://www.youtube.com/watch?v=sony-wh1000xm5",
+    "startTime": "2025-08-22T07:30:00Z",
+    "endTime": "2025-08-22T19:30:00Z"
+  },
+  {
+    "id": 4,
+    "name": "MacBook Pro 16-inch",
+    "rating": 4.8,
+    "details": "M3 Pro chip, 16GB RAM, 1TB SSD, Liquid Retina XDR Display",
+    "price": "235000",
+    "originalPrice": "250000",
+    "discount": 25,
+    "category": "Laptop",
+    "productTag": "special-offer",
+    "images": ["macbook-pro-16.jpg"],
+    "video": "https://www.youtube.com/watch?v=macbook-pro-official",
+    "startTime": "2025-08-22T08:00:00Z",
+    "endTime": "2025-08-22T20:00:00Z"
+  }
+]

@@ -1,0 +1,33 @@
+[
+  {
+    "id": 1,
+    "name": "Huawei",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/thumb/0/04/Huawei_Standard_logo.svg/1200px-Huawei_Standard_logo.svg.png"
+  },
+  {
+    "id": 2,
+    "name": "Xiaomi",
+    "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/Xiaomi_logo_%282021-%29.svg/500px-Xiaomi_logo_%282021-%29.svg.png"
+  },
+  {
+    "id": 3,
+    "name": "OPPO",
+    "logo": "https://download.logo.wine/logo/Oppo/Oppo-Logo.wine.png"
+  },
+ 
+  {
+    "id": 5,
+    "name": "BanglarFashion",
+    "logo": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSbvik4_Kdi4kAJy5c4EOEOPY8KpT-4BFH9iQ&s"
+  },
+  {
+    "id": 6,
+    "name": "Kay Kraft",
+    "logo": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTonBOt-2BWKbe38G_llWYz6hZFC4PN-IjZGA&s"
+  },
+  {
+    "id": 7,
+    "name": "Yellow",
+    "logo": "https://cdn.worldvectorlogo.com/logos/yellow.svg"
+  } 
+]

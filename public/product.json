@@ -1,0 +1,148 @@
+[
+  {
+    "id": 1,
+    "name": "Samsung Galaxy S24 Ultra",
+    "rating": 4.7,
+    "details": "200MP Camera, Snapdragon 8 Gen 3, 12GB RAM, 256GB Storage",
+    "price": "145000",
+    "originalPrice": "160000",
+    "discount": 9,
+    "category": "Smartphone",
+    "productTag": "featured",
+    "images": [
+      "samsung-s24-front.jpg",
+      "samsung-s24-back.jpg",
+      "samsung-s24-side.jpg"
+    ],
+    "video": "https://www.youtube.com/watch?v=samsung-official"
+  },
+  {
+    "id": 2,
+    "name": "Ladies Cotton Three Piece",
+    "rating": 4.6,
+    "details": "Cotton fabric, summer collection, unstitched",
+    "price": "2450",
+    "originalPrice": "2800",
+    "discount": 12,
+    "category": "Fashion",
+    "productTag": "featured",
+    "images": ["threepiece-1.jpg", "threepiece-2.jpg"],
+    "comments": [
+      { "user": "Mitu", "comment": "Very comfortable!", "rating": 5 }
+    ]
+  },
+  {
+    "id": 3,
+    "name": "Men's Leather Wallet",
+    "rating": 4.4,
+    "details": "Genuine leather, slim design, multiple slots",
+    "price": "1200",
+    "originalPrice": "1500",
+    "discount": 20,
+    "category": "Accessories",
+    "productTag": "flash",
+    "images": ["wallet-1.jpg"],
+    "comments": [
+      { "user": "Shakib", "comment": "Stylish and durable.", "rating": 5 }
+    ]
+  },
+  {
+    "id": 4,
+    "name": "Casio G-Shock Watch",
+    "rating": 4.8,
+    "details": "Shock resistant, water resistant, chronograph",
+    "price": "8500",
+    "originalPrice": "9500",
+    "discount": 10,
+    "category": "Watches",
+    "productTag": "featured",
+    "images": ["gshock-1.jpg", "gshock-2.jpg"],
+    "comments": [
+      { "user": "Rafi", "comment": "Rugged and stylish!", "rating": 5 }
+    ]
+  },
+  {
+    "id": 5,
+    "name": "Ladies Handbag",
+    "rating": 4.5,
+    "details": "PU leather, trendy design, multiple compartments",
+    "price": "3200",
+    "originalPrice": "3800",
+    "discount": 15,
+    "category": "Bags",
+    "productTag": "flash",
+    "images": ["handbag-1.jpg", "handbag-2.jpg"],
+    "comments": [{ "user": "Samira", "comment": "Very stylish!", "rating": 5 }]
+  },
+  {
+    "id": 6,
+    "name": "Kitchen Nonstick Cookware Set",
+    "rating": 4.6,
+    "details": "7 pieces, heat resistant, scratch-proof",
+    "price": "5600",
+    "originalPrice": "6200",
+    "discount": 10,
+    "category": "Kitchen",
+    "productTag": "featured",
+    "images": ["cookware-1.jpg"],
+    "comments": [
+      { "user": "Runa", "comment": "Great for daily use!", "rating": 5 }
+    ]
+  },
+  {
+    "id": 7,
+    "name": "Men's Formal Shoes",
+    "rating": 4.3,
+    "details": "Leather, office wear, comfortable fit",
+    "price": "3600",
+    "originalPrice": "4200",
+    "discount": 14,
+    "category": "Footwear",
+    "productTag": "flash",
+    "images": ["shoes-1.jpg"],
+    "comments": [
+      { "user": "Arif", "comment": "Perfect for work.", "rating": 4 }
+    ]
+  },
+  {
+    "id": 8,
+    "name": "Saree Silk Banarasi",
+    "rating": 4.9,
+    "details": "Premium banarasi silk saree, wedding collection",
+    "price": "9500",
+    "originalPrice": "12000",
+    "discount": 21,
+    "category": "Fashion",
+    "productTag": "featured",
+    "images": ["saree-1.jpg", "saree-2.jpg"],
+    "comments": [
+      { "user": "Nasrin", "comment": "Elegant design!", "rating": 5 }
+    ]
+  },
+  {
+    "id": 9,
+    "name": "Smart Bluetooth Earbuds",
+    "rating": 4.5,
+    "details": "Noise cancellation, 24h battery backup",
+    "price": "4200",
+    "originalPrice": "5000",
+    "discount": 16,
+    "category": "Audio",
+    "productTag": "flash",
+    "images": ["earbuds-1.jpg"],
+    "comments": [{ "user": "Siam", "comment": "Great sound!", "rating": 4 }]
+  },
+  {
+    "id": 10,
+    "name": "Men's Polo T-Shirt",
+    "rating": 4.2,
+    "details": "Cotton fabric, summer wear",
+    "price": "950",
+    "originalPrice": "1200",
+    "discount": 20,
+    "category": "Fashion",
+    "productTag": "featured",
+    "images": ["polo-1.jpg"],
+    "comments": [{ "user": "Joy", "comment": "Good quality.", "rating": 4 }]
+  }
+]
