@@ -1,20 +1,20 @@
 [
   {
     "id": 1,
-    "name": "Samsung Galaxy S24 Ultra",
-    "rating": 4.7,
-    "details": "200MP Camera, Snapdragon 8 Gen 3, 12GB RAM, 256GB Storage",
-    "price": "145000",
-    "originalPrice": "160000",
-    "discount": 9,
-    "category": "Smartphone",
-    "productTag": "featured",
+    "name": "Walton Keypad Mobile B15",
+    "rating": 4.4,
+    "details": "Dual SIM, torch light, wireless FM, long standby battery",
+    "price": "1890",
+    "originalPrice": "2190",
+    "discount": 14,
+    "category": "electronics",
+    "productTag": "flash",
     "images": [
-      "samsung-s24-front.jpg",
-      "samsung-s24-back.jpg",
-      "samsung-s24-side.jpg"
+      "https://epanda.com.bd/public/uploads/all/n8CgbEoDFaQGkDnSM5hxFALKa4aqtVlaPa6bz44T.jpg",
+      "https://static-01.daraz.com.bd/p/f323c914d7f1de565412ff1e911b1490.jpg",
+      "https://waltondigitech.com:8000/media/product_variant_image/3-mm25-black.png"
     ],
-    "video": "https://www.youtube.com/watch?v=samsung-official"
+    "videoURL": "https://www.youtube.com/watch?v=walton-b15"
   },
   {
     "id": 2,
@@ -24,125 +24,159 @@
     "price": "2450",
     "originalPrice": "2800",
     "discount": 12,
-    "category": "Fashion",
+    "category": "fashion",
     "productTag": "featured",
-    "images": ["threepiece-1.jpg", "threepiece-2.jpg"],
-    "comments": [
-      { "user": "Mitu", "comment": "Very comfortable!", "rating": 5 }
-    ]
+    "images": [
+      "https://images.othoba.com/images/thumbs/0692857_womens-readymade-cotton-three-piece.webp",
+      "https://images.othoba.com/images/thumbs/0692854_pinted-silk-saree-with-blouse-piece-free.webp",
+      "https://images.othoba.com/images/thumbs/0692857_womens-readymade-cotton-three-piece.webp"
+    ],
+    "videoURL": "https://www.youtube.com/watch?v=threepiece-cotton"
   },
   {
     "id": 3,
     "name": "Men's Leather Wallet",
     "rating": 4.4,
-    "details": "Genuine leather, slim design, multiple slots",
+    "details": "Bangladeshi leather, slim design, multiple card slots",
     "price": "1200",
     "originalPrice": "1500",
     "discount": 20,
     "category": "Accessories",
     "productTag": "flash",
-    "images": ["wallet-1.jpg"],
-    "comments": [
-      { "user": "Shakib", "comment": "Stylish and durable.", "rating": 5 }
-    ]
+    "images": [
+      "https://walletbangladesh.com/wp-content/uploads/2023/08/11.jpg",
+      "https://img.kwcdn.com/product/fancy/50654a78-46c6-4d01-bef4-2d005c05e0f8.jpg?imageMogr2/auto-orient%7CimageView2/2/w/800/q/70/format/webp",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSPcK5_18HENDYWkQwaNw2HOTTyH9fMj2zxS31_Flo9q_G07zngiz02WD1rsdDVhTUOWfA&usqp=CAU"
+    ],
+    "videoURL": "https://www.youtube.com/watch?v=bd-leather-wallet"
   },
   {
-    "id": 4,
-    "name": "Casio G-Shock Watch",
-    "rating": 4.8,
-    "details": "Shock resistant, water resistant, chronograph",
-    "price": "8500",
-    "originalPrice": "9500",
-    "discount": 10,
-    "category": "Watches",
-    "productTag": "featured",
-    "images": ["gshock-1.jpg", "gshock-2.jpg"],
-    "comments": [
-      { "user": "Rafi", "comment": "Rugged and stylish!", "rating": 5 }
-    ]
-  },
-  {
-    "id": 5,
-    "name": "Ladies Handbag",
+    "id": 11,
+    "name": "Walton Laptop W15",
     "rating": 4.5,
-    "details": "PU leather, trendy design, multiple compartments",
-    "price": "3200",
-    "originalPrice": "3800",
-    "discount": 15,
-    "category": "Bags",
-    "productTag": "flash",
-    "images": ["handbag-1.jpg", "handbag-2.jpg"],
-    "comments": [{ "user": "Samira", "comment": "Very stylish!", "rating": 5 }]
-  },
-  {
-    "id": 6,
-    "name": "Kitchen Nonstick Cookware Set",
-    "rating": 4.6,
-    "details": "7 pieces, heat resistant, scratch-proof",
-    "price": "5600",
-    "originalPrice": "6200",
-    "discount": 10,
-    "category": "Kitchen",
+    "details": "Intel i3, 8GB RAM, 256GB SSD, Windows 11",
+    "price": "35000",
+    "originalPrice": "38000",
+    "discount": 8,
+    "category": "electronics",
     "productTag": "featured",
-    "images": ["cookware-1.jpg"],
-    "comments": [
-      { "user": "Runa", "comment": "Great for daily use!", "rating": 5 }
-    ]
+    "images": [
+      "https://static-01.daraz.com.bd/p/68e294791f213f9774118076ab5e0cec.jpg",
+      "https://waltonbd.com/image/cache/catalog/computer/laptop/latest-laptop-price-in-bangladesh-2022-passion-bx-400x472.png"
+    ],
+    "videoURL": "https://www.youtube.com/watch?v=walton-laptop"
   },
   {
-    "id": 7,
-    "name": "Men's Formal Shoes",
-    "rating": 4.3,
-    "details": "Leather, office wear, comfortable fit",
-    "price": "3600",
-    "originalPrice": "4200",
-    "discount": 14,
-    "category": "Footwear",
+    "id": 12,
+    "name": "Mobile Charger 20W Fast Charge",
+    "rating": 4.7,
+    "details": "Fast charging, universal USB-C, compact design",
+    "price": "800",
+    "originalPrice": "1000",
+    "discount": 20,
+    "category": "electronics",
     "productTag": "flash",
-    "images": ["shoes-1.jpg"],
-    "comments": [
-      { "user": "Arif", "comment": "Perfect for work.", "rating": 4 }
-    ]
+    "images": [
+      "https://img.drz.lazcdn.com/static/bd/p/ad4a108d82ada904b0641b4fea2d0b03.jpg_720x720q80.jpg",
+      "https://m.media-amazon.com/images/I/41MRytZPMHS._AC_SL1500_.jpg"
+    ],
+    "videoURL": "https://www.youtube.com/watch?v=mobile-charger"
   },
   {
-    "id": 8,
-    "name": "Saree Silk Banarasi",
+    "id": 13,
+    "name": "Power Bank 10000mAh",
+    "rating": 4.6,
+    "details": "Portable, dual USB output, LED indicator",
+    "price": "1500",
+    "originalPrice": "1800",
+    "discount": 17,
+    "category": "electronics",
+    "productTag": "featured",
+    "images": [
+      "https://static-01.daraz.com.bd/p/2aed1b861bd1d50e20d0fecf59581ec6.jpg",
+      "https://eproyojonbd.com/wp-content/uploads/2024/03/p5k-01-500x500-1.webp"
+    ],
+    "videoURL": "https://www.youtube.com/watch?v=powerbank"
+  },
+  {
+    "id": 14,
+    "name": "Bangladeshi Girl Dress - Frock",
+    "rating": 4.8,
+    "details": "Cotton fabric, colorful print, comfortable fit",
+    "price": "1200",
+    "originalPrice": "1500",
+    "discount": 20,
+    "category": "fashion",
+    "productTag": "flash",
+    "images": [
+      "https://i.pinimg.com/236x/c1/6d/23/c16d235afc523e7bf130734c040cf00b.jpg",
+      "https://www.amr.com.bd/public/uploads/all/F4TjOUUc60vw5kW3lufPCaxgCOi09FNpm0ZVGK1e.jpg"
+    ],
+    "videoURL": "https://www.youtube.com/watch?v=bangladeshi-girl-dress"
+  },
+  {
+    "id": 15,
+    "name": "Lungi - Traditional",
+    "rating": 4.5,
+    "details": "Soft cotton, colorful patterns, one size",
+    "price": "400",
+    "originalPrice": "500",
+    "discount": 20,
+    "category": "fashion",
+    "productTag": "flash",
+    "images": [
+      "https://img.drz.lazcdn.com/static/bd/p/d5c995b12d127149def981530539e716.jpg_720x720q80.jpg",
+      "https://images.miah.shop/product/Amanat_Shah_Lungi_Pradhanno_1053_8209_2.jpg"
+    ],
+    "videoURL": "https://www.youtube.com/watch?v=lungi-bd"
+  },
+  {
+    "id": 16,
+    "name": "Silk Saree Banarasi",
     "rating": 4.9,
     "details": "Premium banarasi silk saree, wedding collection",
     "price": "9500",
     "originalPrice": "12000",
     "discount": 21,
-    "category": "Fashion",
+    "category": "fashion",
     "productTag": "featured",
-    "images": ["saree-1.jpg", "saree-2.jpg"],
-    "comments": [
-      { "user": "Nasrin", "comment": "Elegant design!", "rating": 5 }
-    ]
+    "images": [
+      "https://ilovesarees.com/cdn/shop/files/Premium-Barbie-Pink-Banarasi-Silk-Saree-I-Love-Sarees1.webp?v=1727956731",
+      "https://img.faballey.com/images/Product/XSR06075Z/3.jpg",
+      "https://www.anantexports.in/cdn/shop/files/IMG-20240616-WA0085.jpg?v=1718558862&width=1946"
+    ],
+    "videoURL": "https://www.youtube.com/watch?v=banarasi-saree"
   },
   {
-    "id": 9,
-    "name": "Smart Bluetooth Earbuds",
-    "rating": 4.5,
-    "details": "Noise cancellation, 24h battery backup",
-    "price": "4200",
-    "originalPrice": "5000",
-    "discount": 16,
-    "category": "Audio",
+    "id": 17,
+    "name": "Men's Formal Shirt",
+    "rating": 4.4,
+    "details": "Cotton, slim fit, office wear",
+    "price": "2200",
+    "originalPrice": "2500",
+    "discount": 12,
+    "category": "fashion",
     "productTag": "flash",
-    "images": ["earbuds-1.jpg"],
-    "comments": [{ "user": "Siam", "comment": "Great sound!", "rating": 4 }]
+    "images": [
+      "https://img.drz.lazcdn.com/static/bd/p/a16e29300c401b8d17fbab7f0d4f9d3d.jpg_720x720q80.jpg",
+      "https://i.pinimg.com/474x/c3/93/e0/c393e0dc8adae746d01ac4bd6676c3a6.jpg"
+    ],
+    "videoURL": "https://www.youtube.com/watch?v=mens-shirt-bd"
   },
   {
-    "id": 10,
-    "name": "Men's Polo T-Shirt",
-    "rating": 4.2,
-    "details": "Cotton fabric, summer wear",
-    "price": "950",
-    "originalPrice": "1200",
-    "discount": 20,
-    "category": "Fashion",
+    "id": 18,
+    "name": "Girls's Jewelry Set",
+    "rating": 4.6,
+    "details": "cityGold, stylish design, lightweight",
+    "price": "3200",
+    "originalPrice": "3800",
+    "discount": 15,
+    "category": "jewelry",
     "productTag": "featured",
-    "images": ["polo-1.jpg"],
-    "comments": [{ "user": "Joy", "comment": "Good quality.", "rating": 4 }]
+    "images": [
+      "https://cdn.itshot.com/media/upload/education/2022/04/886x/gold-jewelry-min.jpg?w=1",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTPIYXYrtKNy54X0PUoVN8UfRz73N4FnG-pKPcQ5psmPnfNuHwx_v9RwYoUfDv6zF8QddQ&usqp=CAU"
+    ],
+    "videoURL": "https://www.youtube.com/watch?v=mens-jewelry"
   }
 ]

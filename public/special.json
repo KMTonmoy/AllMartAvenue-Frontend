@@ -7,12 +7,12 @@
     "price": "145000",
     "originalPrice": "160000",
     "discount": 9,
-    "category": "Smartphone",
+    "category": "electronics",
     "productTag": "special-offer",
     "images": [
-      "samsung-s24-front.jpg",
-      "samsung-s24-back.jpg",
-      "samsung-s24-side.jpg"
+      "https://www.mobiledokan.co/wp-content/uploads/2022/12/Samsung-Galaxy-S24-Ultra-Titanium-Yellow.webp",
+      "https://mobilebuzzbd.com/wp-content/uploads/2024/02/s24u-300x300.jpg",
+      "https://thetekcoffee.com/wp-content/uploads/2025/04/galaxy-s24-ultra-cam-titan-1200x675.png"
     ],
     "video": "https://www.youtube.com/watch?v=samsung-official",
     "startTime": "2025-08-22T08:00:00Z",
@@ -26,9 +26,12 @@
     "price": "150000",
     "originalPrice": "165000",
     "discount": 12,
-    "category": "Smartphone",
+    "category": "electronics",
     "productTag": "special-offer",
-    "images": ["iphone15-front.jpg", "iphone15-back.jpg"],
+    "images": [
+      "https://adminapi.applegadgetsbd.com/storage/media/large/iPhone-15-Plus-(2)-(6)-5363.jpg",
+      "https://i5.walmartimages.com/seo/Restored-Apple-iPhone-15-Pro-Max-512GB-AT-T-Blue-Titanium-MU6E3LL-A-Excellent-Condition_dd2d42c6-cc25-4bee-81ef-7847120498d5.663475b807d168a41e9082d258d9c7ce.jpeg"
+    ],
     "video": "https://www.youtube.com/watch?v=iphone15-official",
     "startTime": "2025-08-22T09:00:00Z",
     "endTime": "2025-08-22T21:00:00Z"
@@ -41,9 +44,11 @@
     "price": "29999",
     "originalPrice": "35000",
     "discount": 20,
-    "category": "Audio",
+    "category": "electronics",
     "productTag": "special-offer",
-    "images": ["sony-wh1000xm5.jpg"],
+    "images": [
+      "https://mobilebuzzbd.com/wp-content/uploads/2024/05/sony-wh-1000xm5-1.jpg"
+    ],
     "video": "https://www.youtube.com/watch?v=sony-wh1000xm5",
     "startTime": "2025-08-22T07:30:00Z",
     "endTime": "2025-08-22T19:30:00Z"
@@ -56,9 +61,11 @@
     "price": "235000",
     "originalPrice": "250000",
     "discount": 25,
-    "category": "Laptop",
+    "category": "electronics",
     "productTag": "special-offer",
-    "images": ["macbook-pro-16.jpg"],
+    "images": [
+      "https://istockbd.com/cdn/shop/products/MacBooK-Air-M1-Space-Gray-iStockBD.png?v=1755590430&width=1000"
+    ],
     "video": "https://www.youtube.com/watch?v=macbook-pro-official",
     "startTime": "2025-08-22T08:00:00Z",
     "endTime": "2025-08-22T20:00:00Z"

@@ -1,0 +1,64 @@
+[
+  {
+    "id": 1,
+    "name": "Saree",
+    "description": "Traditional Bangladeshi sarees like Jamdani, Silk, and Cotton.",
+    "image": "https://banglarsare.com/cdn/shop/articles/big_banner-2_1.jpg?v=1743737174",
+    "featured": true
+  },
+  {
+    "id": 2,
+    "name": "Three Piece",
+    "description": "Trendy salwar kameez collections for women.",
+    "image": "https://sobkisubazar.com/public/uploads/all/fBc104afLCnm4nnKS1oy6JtXygyKF0Z69hJOWuHx.jpg"
+  },
+  {
+    "id": 3,
+    "name": "Panjabi",
+    "description": "Men’s Panjabi for festivals and daily wear.",
+    "image": "https://tanbinas.com/storage/product/media/featureimage/6503_img_2022_07_03_103443_39022420.webp",
+    "featured": true
+  },
+  {
+    "id": 4,
+    "name": "Lehenga",
+    "description": "Elegant lehenga choli for weddings and parties.",
+    "image": "https://cdn.shopify.com/s/files/1/0297/4882/2069/files/Premium_red_lehenga_with_blouse_by_Odhni_480x480.png?v=1720511564"
+  },
+  {
+    "id": 5,
+    "name": "Bags",
+    "description": "Handbags, clutches, and backpacks from local brands.",
+    "image": "https://m.media-amazon.com/images/I/61UQLCX1AEL._AC_SL1001_.jpg"
+  },
+  {
+    "id": 6,
+    "name": "Shoes",
+    "description": "Stylish shoes and sandals from Apex, Bata, and others.",
+    "image": "https://img.drz.lazcdn.com/static/bd/p/6502ea35eac4cbdc199499e394609c5f.jpg_720x720q80.jpg"
+  },
+  {
+    "id": 7,
+    "name": "Jewelry",
+    "description": "Gold-plated, silver, and traditional Bangladeshi jewelry.",
+    "image": "https://images.squarespace-cdn.com/content/v1/5984f3d103596ea150c48006/1512166175752-1LSM80BFZA1E1RAM4671/gold.jpg"
+  },
+  {
+    "id": 8,
+    "name": "Tea Set",
+    "description": "Porcelain and ceramic tea sets from Bangladeshi brands.",
+    "image": "https://www.iferi.com/cdn/shop/files/rn-image_picker_lib_temp_e511fb9d-36c3-4b11-b42c-45a3429b7937.jpg?v=1752571619&width=1100"
+  },
+  {
+    "id": 9,
+    "name": "Home Decor",
+    "description": "Showpieces, wall art, and traditional handicrafts.",
+    "image": "https://images-cdn.ubuy.co.in/65090d696a7f7700b74c8c04-ainydie-3d-metal-wall-art-decor.jpg"
+  },
+  {
+    "id": 10,
+    "name": "Electronics",
+    "description": "Popular gadgets and home electronics.",
+    "image": "https://t4.ftcdn.net/jpg/03/64/41/07/360_F_364410756_Ev3WoDfNyxO9c9n4tYIsU5YBQWAP3UF8.jpg"
+  }
+]

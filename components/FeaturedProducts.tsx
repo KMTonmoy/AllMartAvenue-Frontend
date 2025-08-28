@@ -33,12 +33,10 @@ const FeaturedProducts = () => {
     fetch("/product.json")
       .then((res) => res.json())
       .then((data) => {
-        const featured = data.filter(
-          (p: Product) => p.productTag === "featured"
-        );
+        const featured = data.filter((p: Product) => p.productTag === "featured");
         setProducts(featured);
       })
-      .catch((err) => console.error("Failed to load products:", err));
+      .catch(() => {});
   }, []);
 
   const handleProductClick = (id: number) => {
@@ -54,11 +52,7 @@ const FeaturedProducts = () => {
         {[...Array(5)].map((_, i) => (
           <svg
             key={i}
-            className={`w-4 h-4 ${
-              i < fullStars || (hasHalfStar && i === fullStars)
-                ? "text-yellow-400"
-                : "text-gray-300"
-            }`}
+            className={`w-4 h-4 ${i < fullStars || (hasHalfStar && i === fullStars) ? "text-yellow-400" : "text-gray-300"}`}
             fill="currentColor"
             viewBox="0 0 20 20"
           >
@@ -71,19 +65,15 @@ const FeaturedProducts = () => {
   };
 
   return (
-    <section className="py-16 bg-gradient-to-b from-gray-50 to-white">
+    <section className="py-16">
       <div className="container mx-auto px-4">
-        {/* Section Title */}
         <div className="text-center mb-12">
           <motion.h2
             className="text-4xl font-bold mb-4"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            style={{
-              fontFamily: "'Playfair Display', serif",
-              color: "#007873",
-            }}
+            style={{ fontFamily: "'Playfair Display', serif", color: "#000" }}
           >
             Featured Products
           </motion.h2>
@@ -92,11 +82,8 @@ const FeaturedProducts = () => {
           </p>
         </div>
 
-        {/* Products Grid */}
         {products.length === 0 ? (
-          <p className="text-center text-gray-500">
-            No featured products found.
-          </p>
+          <p className="text-center text-gray-500">No featured products found.</p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {products.map((product, index) => (
@@ -109,7 +96,6 @@ const FeaturedProducts = () => {
                 whileHover={{ y: -5 }}
                 onClick={() => handleProductClick(product.id)}
               >
-                {/* Product Image */}
                 <div className="relative overflow-hidden h-48">
                   <img
                     src={product.images[0]}
@@ -128,7 +114,6 @@ const FeaturedProducts = () => {
                   )}
                 </div>
 
-                {/* Product Details */}
                 <div className="p-5 flex flex-col flex-grow">
                   <div className="flex justify-between items-start mb-3">
                     <h3
@@ -148,7 +133,7 @@ const FeaturedProducts = () => {
                   </p>
 
                   <div className="flex items-center mb-4">
-                    <span className="text-xl font-bold text-emerald-700">
+                    <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#1488CC] to-[#2B32B2]">
                       ৳{product.price}
                     </span>
                     {product.originalPrice && (
@@ -158,30 +143,22 @@ const FeaturedProducts = () => {
                     )}
                   </div>
 
-                  {/* Action Buttons */}
                   <div className="flex mt-5 space-x-2">
                     <button
-                      className="flex-1 bg-emerald-700 hover:bg-emerald-800 text-white py-2.5 px-4 rounded-lg text-sm font-medium transition-colors duration-300"
-                      style={{ backgroundColor: "#007873" }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        // Add to cart functionality
-                      }}
+                      className="flex-1 text-white py-2.5 px-4 rounded-lg text-sm font-medium transition-colors duration-300 bg-gradient-to-r from-[#1488CC] to-[#2B32B2] hover:from-[#2B32B2] hover:to-[#1488CC]"
+                      onClick={(e) => e.stopPropagation()}
                     >
                       Add to Cart
                     </button>
                     <button
-                      className="p-2.5 border border-emerald-700 text-emerald-700 rounded-lg hover:bg-emerald-50 transition-colors duration-300"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                      }}
+                      className="p-2.5 border border-[#1488CC] text-[#1488CC] rounded-lg hover:bg-[#1488CC]/10 transition-colors duration-300"
+                      onClick={(e) => e.stopPropagation()}
                     >
                       <svg
                         className="w-5 h-5"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
                       >
                         <path
                           strokeLinecap="round"
