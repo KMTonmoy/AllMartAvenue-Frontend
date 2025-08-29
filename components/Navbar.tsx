@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
+import { GoogleTranslate } from "./GoogleTranslate";
 
 const Navbar = () => {
   const [cartItems] = useState(3);
@@ -46,7 +47,6 @@ const Navbar = () => {
   return (
     <nav
       className={cn(
-        // "sticky top-0 z-50 w-full border-b transition-all duration-300",
         "z-50 w-full border-b transition-all duration-300",
         isScrolled
           ? "bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
@@ -148,6 +148,10 @@ const Navbar = () => {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+
+            <div >
+              <GoogleTranslate />
+            </div>
 
             {/* Mobile Menu */}
             <Sheet>
