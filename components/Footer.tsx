@@ -10,21 +10,24 @@ import {
   Youtube, 
   Mail, 
   Phone, 
-  MapPin, 
-  CreditCard,
-  Shield,
-  Truck,
-  Heart
+  MapPin
 } from "lucide-react";
+import { motion } from "framer-motion";
 import Logo from "../assets/Logo.png";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 const Footer = () => {
   return (
-    <footer className="bg-gray-900 text-white mt-auto">
+    <motion.footer
+      className="bg-gray-900 text-white mt-auto"
+      initial={{ opacity: 0, y: 100 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8, ease: "easeOut" }}
+      viewport={{ once: false }}
+    >
       {/* Newsletter Section */}
-      <div className="bg-[#007873] py-8">
+      <div className="bg-gradient-to-r from-[#1488CC] to-[#2B32B2] py-8">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <div className="text-center md:text-left">
@@ -51,7 +54,7 @@ const Footer = () => {
           {/* Company Info */}
           <div className="space-y-4">
             <Link href="/" className="flex items-center space-x-2">
-              <div className="h-10 w-10 bg-gradient-to-br from-[#007873] to-teal-800 rounded-md flex items-center justify-center">
+              <div className="h-10 w-10 bg-gradient-to-br from-[#1488CC] to-[#2B32B2] rounded-md flex items-center justify-center">
                 <Image
                   src={Logo}
                   alt="AllMart Avenue Logo"
@@ -66,16 +69,16 @@ const Footer = () => {
               Your one-stop destination for all your shopping needs. Quality products at affordable prices.
             </p>
             <div className="flex space-x-4">
-              <a href="#" className="text-gray-300 hover:text-white transition-colors">
+              <a href="#" className="text-gray-300 hover:text-[#1488CC] transition-colors">
                 <Facebook className="h-6 w-6" />
               </a>
-              <a href="#" className="text-gray-300 hover:text-white transition-colors">
+              <a href="#" className="text-gray-300 hover:text-[#1488CC] transition-colors">
                 <Twitter className="h-6 w-6" />
               </a>
-              <a href="#" className="text-gray-300 hover:text-white transition-colors">
+              <a href="#" className="text-gray-300 hover:text-[#1488CC] transition-colors">
                 <Instagram className="h-6 w-6" />
               </a>
-              <a href="#" className="text-gray-300 hover:text-white transition-colors">
+              <a href="#" className="text-gray-300 hover:text-[#1488CC] transition-colors">
                 <Youtube className="h-6 w-6" />
               </a>
             </div>
@@ -85,146 +88,52 @@ const Footer = () => {
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Quick Links</h3>
             <ul className="space-y-2">
-              <li>
-                <Link href="/" className="text-gray-300 hover:text-[#007873] transition-colors">
-                  Home
-                </Link>
-              </li>
-              <li>
-                <Link href="/electronics" className="text-gray-300 hover:text-[#007873] transition-colors">
-                  Electronics
-                </Link>
-              </li>
-              <li>
-                <Link href="/fashion" className="text-gray-300 hover:text-[#007873] transition-colors">
-                  Fashion
-                </Link>
-              </li>
-              <li>
-                <Link href="/jewelry" className="text-gray-300 hover:text-[#007873] transition-colors">
-                  Jewelry
-                </Link>
-              </li>
-              <li>
-                <Link href="/premium" className="text-gray-300 hover:text-[#007873] transition-colors">
-                  Premium
-                </Link>
-              </li>
-              <li>
-                <Link href="/developers" className="text-gray-300 hover:text-[#007873] transition-colors">
-                  Our Developers
-                </Link>
-              </li>
+              <li><Link href="/" className="text-gray-300 hover:text-[#1488CC]">Home</Link></li>
+              <li><Link href="/electronics" className="text-gray-300 hover:text-[#1488CC]">Electronics</Link></li>
+              <li><Link href="/fashion" className="text-gray-300 hover:text-[#1488CC]">Fashion</Link></li>
+              <li><Link href="/jewelry" className="text-gray-300 hover:text-[#1488CC]">Jewelry</Link></li>
+              <li><Link href="/premium" className="text-gray-300 hover:text-[#1488CC]">Premium</Link></li>
             </ul>
           </div>
 
-          {/* Customer Service */}
+          {/* Customer Support */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Customer Service</h3>
+            <h3 className="text-lg font-semibold">Customer Support</h3>
             <ul className="space-y-2">
-              <li>
-                <Link href="/contact" className="text-gray-300 hover:text-[#007873] transition-colors">
-                  Contact Us
-                </Link>
-              </li>
-              <li>
-                <Link href="/faq" className="text-gray-300 hover:text-[#007873] transition-colors">
-                  FAQ
-                </Link>
-              </li>
-              <li>
-                <Link href="/returns" className="text-gray-300 hover:text-[#007873] transition-colors">
-                  Returns & Refunds
-                </Link>
-              </li>
-              <li>
-                <Link href="/shipping" className="text-gray-300 hover:text-[#007873] transition-colors">
-                  Shipping Information
-                </Link>
-              </li>
-              <li>
-                <Link href="/privacy" className="text-gray-300 hover:text-[#007873] transition-colors">
-                  Privacy Policy
-                </Link>
-              </li>
-              <li>
-                <Link href="/terms" className="text-gray-300 hover:text-[#007873] transition-colors">
-                  Terms & Conditions
-                </Link>
-              </li>
+              <li><a href="#" className="text-gray-300 hover:text-[#1488CC]">FAQ</a></li>
+              <li><a href="#" className="text-gray-300 hover:text-[#1488CC]">Returns</a></li>
+              <li><a href="#" className="text-gray-300 hover:text-[#1488CC]">Shipping</a></li>
+              <li><a href="#" className="text-gray-300 hover:text-[#1488CC]">Privacy Policy</a></li>
+              <li><a href="#" className="text-gray-300 hover:text-[#1488CC]">Terms of Service</a></li>
             </ul>
           </div>
 
           {/* Contact Info */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Contact Info</h3>
-            <div className="space-y-3">
-              <div className="flex items-start space-x-3">
-                <MapPin className="h-5 w-5 text-[#007873] mt-0.5" />
-                <p className="text-gray-300">123 Shopping Avenue, Retail District, Market City, 10001</p>
-              </div>
-              <div className="flex items-center space-x-3">
-                <Phone className="h-5 w-5 text-[#007873]" />
-                <p className="text-gray-300">+1 (555) 123-4567</p>
-              </div>
-              <div className="flex items-center space-x-3">
-                <Mail className="h-5 w-5 text-[#007873]" />
-                <p className="text-gray-300">support@allmartavenue.com</p>
-              </div>
-            </div>
+            <h3 className="text-lg font-semibold">Contact Us</h3>
+            <ul className="space-y-2 text-gray-300">
+              <li className="flex items-center space-x-2">
+                <Mail className="h-5 w-5 text-[#1488CC]" />
+                <span>support@allmartavenue.com</span>
+              </li>
+              <li className="flex items-center space-x-2">
+                <Phone className="h-5 w-5 text-[#1488CC]" />
+                <span>+880 123 456 789</span>
+              </li>
+              <li className="flex items-center space-x-2">
+                <MapPin className="h-5 w-5 text-[#1488CC]" />
+                <span>Dhaka, Bangladesh</span>
+              </li>
+            </ul>
           </div>
         </div>
       </div>
 
-      {/* Trust Badges */}
-      <div className="border-t border-gray-800 py-6">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-            <div className="flex items-center gap-6 flex-wrap justify-center">
-              <div className="flex items-center gap-2 text-sm">
-                <Truck className="h-5 w-5 text-[#007873]" />
-                <span>Free Shipping on Orders Over $50</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm">
-                <Shield className="h-5 w-5 text-[#007873]" />
-                <span>Secure Payment</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm">
-                <CreditCard className="h-5 w-5 text-[#007873]" />
-                <span>Easy Returns</span>
-              </div>
-            </div>
-          </div>
-        </div>
+      {/* Bottom Bar */}
+      <div className="border-t border-gray-700 py-4 text-center text-gray-400 text-sm">
+        © {new Date().getFullYear()} AllMart Avenue. All rights reserved.
       </div>
-
-      {/* Copyright */}
-      <div className="border-t border-gray-800 py-6">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-gray-400 text-sm">
-              © {new Date().getFullYear()} AllMart Avenue. All rights reserved.
-            </p>
-            <div className="flex items-center gap-2 text-gray-400 text-sm">
-              <span>Made with</span>
-              <Heart className="h-4 w-4 text-red-500" />
-              <span>by our developers</span>
-            </div>
-            <div className="flex gap-6 text-sm">
-              <Link href="/privacy" className="text-gray-400 hover:text-[#007873] transition-colors">
-                Privacy Policy
-              </Link>
-              <Link href="/terms" className="text-gray-400 hover:text-[#007873] transition-colors">
-                Terms of Service
-              </Link>
-              <Link href="/sitemap" className="text-gray-400 hover:text-[#007873] transition-colors">
-                Sitemap
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
-    </footer>
+    </motion.footer>
   );
 };
 
