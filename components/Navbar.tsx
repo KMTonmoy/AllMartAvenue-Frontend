@@ -8,6 +8,7 @@ import { Search, ShoppingCart, User, Menu, X, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Logo from "../assets/Logo.png";
 import {
   DropdownMenu,
@@ -32,7 +33,6 @@ const Navbar = () => {
   const [signupOpen, setSignupOpen] = useState(false);
   const pathname = usePathname();
   const auth = useContext(AuthContext);
-
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 10);
     window.addEventListener("scroll", handleScroll);
@@ -66,6 +66,16 @@ const Navbar = () => {
     }
   };
 
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((word) => word[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
+  console.log(auth?.user);
   if (loading) {
     return (
       <nav className="z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -182,22 +192,38 @@ const Navbar = () => {
                       size="icon"
                       className="hidden md:flex"
                     >
-                      <User className="h-5 w-5" />
+                      <Avatar>
+                        <AvatarImage src={auth.user.photoURL ?? undefined} />
+                        <AvatarFallback>
+                          {auth.user.displayName
+                            ? getInitials(auth.user.displayName)
+                            : "U"}
+                        </AvatarFallback>
+                      </Avatar>
+
                       <span className="sr-only">Account</span>
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-40">
-                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuContent align="end" className="w-48">
+                    <DropdownMenuLabel className="flex flex-col">
+                      <span className="font-semibold">
+                        {auth.user.displayName || "User"}
+                      </span>
+                    </DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem>
-                      <User className="h-4 w-4 mr-2" /> Profile
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <ShoppingCart className="h-4 w-4 mr-2" /> Orders
-                    </DropdownMenuItem>
+                    <Link href={"/profile"} className="cursor-pointer">
+                      <DropdownMenuItem className="cursor-pointer">
+                        <User className="h-4 w-4 mr-2" /> Profile
+                      </DropdownMenuItem>
+                    </Link>
+                    <Link href={"/myorders"}>
+                      <DropdownMenuItem className="cursor-pointer">
+                        <ShoppingCart className="h-4 w-4 mr-2 cursor-pointer" /> Orders
+                      </DropdownMenuItem>
+                    </Link>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
-                      className="text-destructive"
+                      className="text-destructive cursor-pointer"
                       onClick={auth.logOut}
                     >
                       <X className="h-4 w-4 mr-2" /> Sign out

@@ -18,7 +18,12 @@ import axios from "axios";
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  createUser: (email: string, password: string) => Promise<void>;
+  createUser: (
+    email: string,
+    password: string,
+    name: string,
+    photo: string
+  ) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
   logOut: () => Promise<void>;
@@ -35,10 +40,31 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  const createUser = async (email: string, password: string) => {
+  const createUser = async (
+    email: string,
+    password: string,
+    name: string,
+    photo: string
+  ) => {
     setLoading(true);
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+
+      await updateProfile(userCredential.user, {
+        displayName: name,
+        photoURL: photo,
+      });
+
+      await saveUser({
+        ...userCredential.user,
+        displayName: name,
+        photoURL: photo,
+      } as User);
+
       router.push("/");
     } catch (error) {
       console.error("Error creating user:", error);
@@ -106,15 +132,18 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const saveUser = async (user: User) => {
     try {
+      // Check if user already exists in database
       const existingUserResponse = await axios.get(
         `http://localhost:8000/users/${user?.email}`
       );
       const existingUser = existingUserResponse.data;
 
+      // If user already exists, don't save again
       if (existingUser) {
         return existingUser;
       }
 
+      // Only save new users
       const currentUser = {
         email: user?.email,
         name: user?.displayName,
@@ -122,6 +151,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
         role: "user",
         provider: user.providerData[0]?.providerId || "email",
       };
+
       const { data } = await axios.put(
         `http://localhost:8000/user`,
         currentUser
@@ -137,6 +167,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
       if (currentUser) {
+        // Only save user if they don't already exist in database
         setTimeout(async () => {
           try {
             await saveUser(currentUser);
