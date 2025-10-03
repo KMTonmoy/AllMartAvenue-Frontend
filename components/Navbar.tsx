@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { MdAdminPanelSettings } from "react-icons/md";
+
 import Logo from "../assets/Logo.png";
 import {
   DropdownMenu,
@@ -211,6 +213,11 @@ const Navbar = () => {
                       </span>
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
+                    <Link href={"/dashboard"} className="cursor-pointer">
+                      <DropdownMenuItem className="cursor-pointer">
+                        <MdAdminPanelSettings className="h-4 w-4 mr-2" /> Dashboard
+                      </DropdownMenuItem>
+                    </Link>
                     <Link href={"/profile"} className="cursor-pointer">
                       <DropdownMenuItem className="cursor-pointer">
                         <User className="h-4 w-4 mr-2" /> Profile
