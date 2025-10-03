@@ -4,7 +4,7 @@ export interface ProductColor {
 }
 
 export interface Product {
-  id: number;
+  _id: number;
   name: string;
   description: string;
   details: string;

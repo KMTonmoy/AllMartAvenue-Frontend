@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Search, ShoppingCart, User, Menu, X, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,8 +33,11 @@ const Navbar = () => {
   const [loading, setLoading] = useState(true);
   const [loginOpen, setLoginOpen] = useState(false);
   const [signupOpen, setSignupOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const pathname = usePathname();
+  const router = useRouter();
   const auth = useContext(AuthContext);
+
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 10);
     window.addEventListener("scroll", handleScroll);
@@ -65,6 +68,21 @@ const Navbar = () => {
       auth.signInWithGoogle();
       setLoginOpen(false);
       setSignupOpen(false);
+    }
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchTerm.trim()) {
+      const searchQuery = searchTerm.trim().toLowerCase().replace(/\s+/g, '-');
+      router.push(`/products/${searchQuery}`);
+      setSearchTerm(""); // Clear search input after navigation
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSearch(e);
     }
   };
 
@@ -163,28 +181,33 @@ const Navbar = () => {
             </div>
 
             <div className="flex items-center gap-2">
-              <div className="hidden md:flex items-center relative">
+              <form onSubmit={handleSearch} className="hidden md:flex items-center relative">
                 <Search className="absolute left-3 h-4 w-4 text-muted-foreground" />
                 <Input
                   type="search"
                   placeholder="Search products..."
                   className="w-[300px] pl-9 pr-4 rounded-xl"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onKeyPress={handleKeyPress}
                 />
-              </div>
+              </form>
 
-              <Button
-                variant="ghost"
-                size="icon"
-                className="relative hover:bg-gradient-to-r hover:from-[#1488CC]/10 hover:to-[#2B32B2]/10"
-              >
-                <ShoppingCart className="h-5 w-5" />
-                {cartItems > 0 && (
-                  <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full text-xs text-white flex items-center justify-center bg-gradient-to-r from-[#1488CC] to-[#2B32B2] shadow-md">
-                    {cartItems}
-                  </span>
-                )}
-                <span className="sr-only">Cart</span>
-              </Button>
+              <Link href={'/cart'}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="relative hover:bg-gradient-to-r hover:from-[#1488CC]/10 hover:to-[#2B32B2]/10"
+                >
+                  <ShoppingCart className="h-5 w-5" />
+                  {cartItems > 0 && (
+                    <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full text-xs text-white flex items-center justify-center bg-gradient-to-r from-[#1488CC] to-[#2B32B2] shadow-md">
+                      {cartItems}
+                    </span>
+                  )}
+                  <span className="sr-only">Cart</span>
+                </Button>
+              </Link>
 
               {auth?.user ? (
                 <DropdownMenu>
@@ -273,6 +296,20 @@ const Navbar = () => {
                         AllMart Avenue
                       </span>
                     </Link>
+
+                    {/* Mobile Search */}
+                    <form onSubmit={handleSearch} className="flex items-center relative">
+                      <Search className="absolute left-3 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        type="search"
+                        placeholder="Search products..."
+                        className="w-full pl-9 pr-4 rounded-xl"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        onKeyPress={handleKeyPress}
+                      />
+                    </form>
+
                     <div className="flex flex-col gap-4">
                       {categories.map((category) => {
                         const isActive = isActiveLink(category.href);
@@ -299,14 +336,17 @@ const Navbar = () => {
           </div>
 
           <div className="flex pb-3 md:hidden">
-            <div className="relative w-full">
+            <form onSubmit={handleSearch} className="relative w-full">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 type="search"
                 placeholder="Search products..."
                 className="w-full pl-9 pr-4 rounded-xl shadow-sm"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyPress={handleKeyPress}
               />
-            </div>
+            </form>
           </div>
         </div>
       </nav>

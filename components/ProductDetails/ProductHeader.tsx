@@ -13,7 +13,7 @@ const ProductHeader: React.FC<ProductHeaderProps> = ({ product }) => {
           {product.productTag}
         </div>
         <div className="text-sm text-gray-500">
-          SKU: <span className="font-medium text-gray-900">FASH{product.id}</span>
+          SKU: <span className="font-medium text-gray-900">FASH{product._id}</span>
         </div>
       </div>
 

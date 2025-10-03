@@ -1,5 +1,7 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'next/navigation';
+import axios from 'axios';
 import { Copy } from 'lucide-react';
 import { Product } from '@/types/product';
 import Breadcrumb from '@/components/ProductDetails/Breadcrumb';
@@ -12,54 +14,47 @@ import ActionButtons from '@/components/ProductDetails/ActionButtons';
 import ServiceFeatures from '@/components/ProductDetails/ServiceFeatures';
 import ProductDescription from '@/components/ProductDetails/ProductDescription';
 
+const ProductDetails: React.FC = () => {
+  const params = useParams();
+  const productId = params.id as string;
 
-interface ProductDetailsProps {
-  product?: Product;
-}
-
-const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
-  const [selectedColor, setSelectedColor] = useState<string>(product?.colors?.[0]?.value || '#1488CC');
+  const [selectedColor, setSelectedColor] = useState<string>('#1488CC');
   const [quantity, setQuantity] = useState<number>(1);
   const [selectedImage, setSelectedImage] = useState<number>(0);
   const [showNotification, setShowNotification] = useState<boolean>(false);
+  const [currentProduct, setCurrentProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Default product data
-  const defaultProduct: Product = {
-    id: 2,
-    name: "Ladies Cotton Three Piece",
-    description: "This beautiful cotton three-piece set is perfect for summer occasions. Made from 100% premium cotton fabric, it offers exceptional comfort and breathability. The unstitched design allows for custom tailoring to ensure the perfect fit for any body type.",
-    details: "Cotton fabric, summer collection, unstitched",
-    price: "2450",
-    originalPrice: "2800",
-    discount: 12,
-    category: "fashion",
-    productTag: "featured",
-    stock: 15,
-    colors: [
-      { value: '#1488CC', name: 'Sky Blue' },
-      { value: '#2B32B2', name: 'Royal Blue' },
-      { value: '#000000', name: 'Black' },
-      { value: '#FFFFFF', name: 'White' }
-    ],
-    images: [
-      'https://images.othoba.com/images/thumbs/0692857_womens-readymade-cotton-three-piece.webp',
-      'https://images.othoba.com/images/thumbs/0692854_pinted-silk-saree-with-blouse-piece-free.webp',
-      'https://images.othoba.com/images/thumbs/0692857_womens-readymade-cotton-three-piece.webp'
-    ],
-    videoURL: "https://www.youtube.com/embed/YzcWhOROTDg?si=9jIHl0Cf1JEF_Wrx",
-    features: [
-      "100% Premium Cotton Fabric",
-      "Summer Collection 2024",
-      "Unstitched for Custom Tailoring",
-      "Machine Washable",
-      "Available in Multiple Colors"
-    ]
-  };
+  // Fetch product from API using the ID from URL
+  useEffect(() => {
+    const fetchProduct = async () => {
+      if (!productId) {
+        setError('Product ID not found');
+        setLoading(false);
+        return;
+      }
 
-  const currentProduct = product || defaultProduct;
+      try {
+        setLoading(true);
+        const response = await axios.get(`http://localhost:8000/products/${productId}`);
+        const productData = response.data;
+        setCurrentProduct(productData);
+        setSelectedColor(productData.colors?.[0]?.value || '#1488CC');
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching product:', err);
+        setError('Failed to load product');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [productId]);
 
   const handleIncrement = (): void => {
-    if (quantity < currentProduct.stock) {
+    if (currentProduct && quantity < currentProduct.stock) {
       setQuantity(quantity + 1);
     }
   };
@@ -71,7 +66,9 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
   };
 
   const handleShare = async (): Promise<void> => {
-    const productUrl = `${window.location.origin}/product/${currentProduct.id}`;
+    if (!currentProduct) return;
+
+    const productUrl = `${window.location.origin}/product/${currentProduct._id}`;
     try {
       await navigator.clipboard.writeText(productUrl);
       setShowNotification(true);
@@ -87,6 +84,34 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
       setTimeout(() => setShowNotification(false), 2000);
     }
   };
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-center items-center h-64">
+            <div className="text-lg text-gray-600">Loading product...</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error || !currentProduct) {
+    return (
+      <div className="min-h-screen bg-white py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-center items-center h-64">
+            <div className="text-lg text-red-600">
+              {error || 'Product not found'}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white py-8">

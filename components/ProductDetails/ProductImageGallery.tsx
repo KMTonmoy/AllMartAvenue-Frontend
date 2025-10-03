@@ -43,12 +43,12 @@ const ProductImageGallery: React.FC<ProductImageGalleryProps> = ({
         {/* Video Thumbnail */}
         <button
           onClick={() => setSelectedImage(0)}
-          className={`aspect-square rounded-xl overflow-hidden border-2 relative transition-all duration-200 ${selectedImage === 0
-              ? 'border-blue-500 shadow-md'
-              : 'border-gray-200 hover:border-gray-300'
+          className={`aspect-square rounded-xl overflow-hidden relative transition-all duration-200 ${selectedImage === 0
+              ? 'p-1 bg-gradient-to-br from-blue-500 to-purple-600 shadow-lg'
+              : 'border-2 border-gray-200 hover:border-gray-300'
             }`}
         >
-          <div className="w-full h-full bg-gradient-to-br from-gray-800 to-gray-600 flex items-center justify-center">
+          <div className="w-full h-full bg-gradient-to-br from-gray-800 to-gray-600 flex items-center justify-center rounded-lg">
             <Play className="w-6 h-6 text-white" />
           </div>
           <div className="absolute bottom-1 right-1 bg-black bg-opacity-80 text-white text-xs px-2 py-1 rounded">
@@ -61,15 +61,15 @@ const ProductImageGallery: React.FC<ProductImageGalleryProps> = ({
           <button
             key={index}
             onClick={() => setSelectedImage(index + 1)}
-            className={`aspect-square rounded-xl overflow-hidden border-2 transition-all duration-200 ${selectedImage === index + 1
-                ? 'border-blue-500 shadow-md'
-                : 'border-gray-200 hover:border-gray-300'
+            className={`aspect-square rounded-xl overflow-hidden relative transition-all duration-200 ${selectedImage === index + 1
+                ? 'p-1 bg-gradient-to-br from-blue-500 to-purple-600 shadow-lg'
+                : 'border-2 border-gray-200 hover:border-gray-300'
               }`}
           >
             <img
               src={image}
               alt={`${product.name} view ${index + 1}`}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover rounded-lg"
             />
           </button>
         ))}
