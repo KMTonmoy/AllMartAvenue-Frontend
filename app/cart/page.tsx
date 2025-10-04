@@ -223,7 +223,7 @@ const CartPage = () => {
           `,
           icon: 'success',
           showCancelButton: true,
-          confirmButtonText: 'Download Invoice',
+          confirmButtonText: 'Invoice',
           cancelButtonText: 'Continue Shopping',
           confirmButtonColor: '#3085d6',
           cancelButtonColor: '#d33',
@@ -272,18 +272,7 @@ const CartPage = () => {
     }
   };
 
-  const downloadAsPNG = () => {
-    const invoiceElement = document.getElementById('invoice');
 
-    if (invoiceElement) {
-      html2canvas(invoiceElement).then((canvas) => {
-        const link = document.createElement('a');
-        link.download = `invoice-${orderData?.orderNumber}.png`;
-        link.href = canvas.toDataURL();
-        link.click();
-      });
-    }
-  };
 
   if (cartItems.length === 0 && !orderData) {
     return (
@@ -317,20 +306,8 @@ const CartPage = () => {
               <p className="text-gray-600 mb-6">Thank you for shopping with us. Your order is being processed.</p>
 
               <div className="flex gap-4 justify-center mb-8">
-                <button
-                  onClick={downloadInvoice}
-                  className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
-                >
-                  <Download className="w-4 h-4" />
-                  Download PDF Invoice
-                </button>
-                <button
-                  onClick={downloadAsPNG}
-                  className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2"
-                >
-                  <Download className="w-4 h-4" />
-                  Download PNG
-                </button>
+         
+
                 <button
                   onClick={() => window.location.href = '/products'}
                   className="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors"

@@ -24,16 +24,14 @@ const Fashion = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const [res1, res2] = await Promise.all([
-          fetch("/product.json"),
-          fetch("/special.json"),
-        ]);
+        const [res1] = await Promise.all([
+          fetch("https://all-mart-avenue-backend.vercel.app/products"),
+         ]);
 
         const data1: Product[] = await res1.json();
-        const data2: Product[] = await res2.json();
 
         // Combine both arrays
-        const combined = [...data1, ...data2];
+        const combined = [...data1];
 
         // Filter fashion only
         const fashionProducts = combined.filter(
