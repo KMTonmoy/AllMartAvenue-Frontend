@@ -106,12 +106,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0, onAddToCa
           </div>
         )}
 
-        <button
-          className="w-full text-white py-2.5 px-4 rounded-lg text-sm font-medium transition-colors duration-300 bg-gradient-to-r from-[#1488CC] to-[#2B32B2] hover:from-[#2B32B2] hover:to-[#1488CC]"
-          onClick={handleAddToCart}
-        >
-          Add to Cart
-        </button>
+    
       </div>
     </motion.div>
   );

@@ -1,32 +1,40 @@
 'use client'
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import axios from 'axios';
-import { Copy } from 'lucide-react';
+import { Copy, ShoppingCart, Zap } from 'lucide-react';
 import { Product } from '@/types/product';
 import Breadcrumb from '@/components/ProductDetails/Breadcrumb';
 import ProductImageGallery from '@/components/ProductDetails/ProductImageGallery';
 import ProductHeader from '@/components/ProductDetails/ProductHeader';
 import PriceDisplay from '@/components/ProductDetails/PriceDisplay';
-import ColorSelector from '@/components/ProductDetails/ColorSelector';
 import QuantitySelector from '@/components/ProductDetails/QuantitySelector';
-import ActionButtons from '@/components/ProductDetails/ActionButtons';
 import ServiceFeatures from '@/components/ProductDetails/ServiceFeatures';
 import ProductDescription from '@/components/ProductDetails/ProductDescription';
 
+interface CartItem {
+  product: Product;
+  quantity: number;
+  selectedColor: string;
+  selectedColorName: string;
+  addedAt: string;
+}
+
 const ProductDetails: React.FC = () => {
   const params = useParams();
+  const router = useRouter();
   const productId = params.id as string;
 
   const [selectedColor, setSelectedColor] = useState<string>('#1488CC');
+  const [selectedColorName, setSelectedColorName] = useState<string>('Blue');
   const [quantity, setQuantity] = useState<number>(1);
   const [selectedImage, setSelectedImage] = useState<number>(0);
   const [showNotification, setShowNotification] = useState<boolean>(false);
+  const [notificationMessage, setNotificationMessage] = useState<string>('');
   const [currentProduct, setCurrentProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch product from API using the ID from URL
   useEffect(() => {
     const fetchProduct = async () => {
       if (!productId) {
@@ -37,10 +45,15 @@ const ProductDetails: React.FC = () => {
 
       try {
         setLoading(true);
-        const response = await axios.get(`http://localhost:8000/products/${productId}`);
+        const response = await axios.get(`https://all-mart-avenue-backend.vercel.app/products/${productId}`);
         const productData = response.data;
         setCurrentProduct(productData);
-        setSelectedColor(productData.colors?.[0]?.value || '#1488CC');
+
+        if (productData.colors && productData.colors.length > 0) {
+          setSelectedColor(productData.colors[0].value);
+          setSelectedColorName(productData.colors[0].name);
+        }
+
         setError(null);
       } catch (err) {
         console.error('Error fetching product:', err);
@@ -71,8 +84,7 @@ const ProductDetails: React.FC = () => {
     const productUrl = `${window.location.origin}/product/${currentProduct._id}`;
     try {
       await navigator.clipboard.writeText(productUrl);
-      setShowNotification(true);
-      setTimeout(() => setShowNotification(false), 2000);
+      showNotificationMessage('Product link copied to clipboard!');
     } catch (err) {
       const textArea = document.createElement('textarea');
       textArea.value = productUrl;
@@ -80,12 +92,83 @@ const ProductDetails: React.FC = () => {
       textArea.select();
       document.execCommand('copy');
       document.body.removeChild(textArea);
-      setShowNotification(true);
-      setTimeout(() => setShowNotification(false), 2000);
+      showNotificationMessage('Product link copied to clipboard!');
     }
   };
 
-  // Loading state
+  const showNotificationMessage = (message: string) => {
+    setNotificationMessage(message);
+    setShowNotification(true);
+    setTimeout(() => setShowNotification(false), 3000);
+  };
+
+  const getCartFromStorage = (): CartItem[] => {
+    if (typeof window === 'undefined') return [];
+
+    try {
+      const cartData = localStorage.getItem('allmart-cart');
+      return cartData ? JSON.parse(cartData) : [];
+    } catch (error) {
+      console.error('Error reading cart from localStorage:', error);
+      return [];
+    }
+  };
+
+  const saveCartToStorage = (cart: CartItem[]): void => {
+    if (typeof window === 'undefined') return;
+
+    try {
+      localStorage.setItem('allmart-cart', JSON.stringify(cart));
+    } catch (error) {
+      console.error('Error saving cart to localStorage:', error);
+    }
+  };
+
+  const handleAddToCart = (): void => {
+    if (!currentProduct) return;
+
+    const cartItem: CartItem = {
+      product: currentProduct,
+      quantity: quantity,
+      selectedColor: selectedColor,
+      selectedColorName: selectedColorName,
+      addedAt: new Date().toISOString()
+    };
+
+    const currentCart = getCartFromStorage();
+
+    const existingItemIndex = currentCart.findIndex(
+      item => item.product._id === currentProduct._id && item.selectedColor === selectedColor
+    );
+
+    let updatedCart: CartItem[];
+
+    if (existingItemIndex > -1) {
+      updatedCart = [...currentCart];
+      updatedCart[existingItemIndex].quantity += quantity;
+    } else {
+      updatedCart = [...currentCart, cartItem];
+    }
+
+    saveCartToStorage(updatedCart);
+    showNotificationMessage(`Added ${quantity} item(s) to cart!`);
+  };
+
+  const handleBuyNow = (): void => {
+    if (!currentProduct) return;
+
+    handleAddToCart();
+
+    setTimeout(() => {
+      router.push('/cart');
+    }, 500);
+  };
+
+  const handleColorSelect = (colorValue: string, colorName: string): void => {
+    setSelectedColor(colorValue);
+    setSelectedColorName(colorName);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-white py-8">
@@ -98,7 +181,6 @@ const ProductDetails: React.FC = () => {
     );
   }
 
-  // Error state
   if (error || !currentProduct) {
     return (
       <div className="min-h-screen bg-white py-8">
@@ -115,37 +197,57 @@ const ProductDetails: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white py-8">
-      {/* Notification */}
       {showNotification && (
         <div className="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 flex items-center space-x-2 animate-fade-in">
           <Copy className="w-4 h-4" />
-          <span>Product link copied to clipboard!</span>
+          <span>{notificationMessage}</span>
         </div>
       )}
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Dynamic Breadcrumb */}
         <Breadcrumb productName={currentProduct.name} />
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Product Images */}
           <ProductImageGallery
             product={currentProduct}
             selectedImage={selectedImage}
             setSelectedImage={setSelectedImage}
           />
 
-          {/* Product Info */}
           <div className="space-y-8">
             <ProductHeader product={currentProduct} />
             <PriceDisplay product={currentProduct} />
-            <ColorSelector
-              product={currentProduct}
-              selectedColor={selectedColor}
-              setSelectedColor={setSelectedColor}
-            />
 
-            {/* Quantity & Actions */}
+            {/* Color Selector - Added directly here */}
+            {currentProduct.colors && currentProduct.colors.length > 0 && (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-semibold text-gray-900">Color</h3>
+                  <span className="text-sm text-gray-600">
+                    Selected: {selectedColorName}
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-3">
+                  {currentProduct.colors.map((color) => (
+                    <button
+                      key={color.value}
+                      onClick={() => handleColorSelect(color.value, color.name)}
+                      className={`w-12 h-12 rounded-full border-2 transition-all duration-200 flex items-center justify-center ${selectedColor === color.value
+                        ? 'border-blue-500 ring-2 ring-blue-200'
+                        : 'border-gray-300 hover:border-gray-400'
+                        }`}
+                      style={{ backgroundColor: color.value }}
+                      title={color.name}
+                    >
+                      {selectedColor === color.value && (
+                        <div className="w-2 h-2 bg-white rounded-full opacity-80" />
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <div className="space-y-4">
               <QuantitySelector
                 product={currentProduct}
@@ -154,16 +256,46 @@ const ProductDetails: React.FC = () => {
                 onDecrement={handleDecrement}
               />
 
-              <ActionButtons
-                product={currentProduct}
-                onShare={handleShare}
-              />
+              <div className="flex flex-col sm:flex-row gap-4">
+                <button
+                  onClick={handleAddToCart}
+                  disabled={currentProduct.stock === 0}
+                  className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-4 px-6 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-3"
+                >
+                  <ShoppingCart className="w-5 h-5" />
+                  Add to Cart
+                </button>
 
-              {/* Stock Warning */}
+                <button
+                  onClick={handleBuyNow}
+                  disabled={currentProduct.stock === 0}
+                  className="flex-1 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white py-4 px-6 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-3"
+                >
+                  <Zap className="w-5 h-5" />
+                  Buy Now
+                </button>
+              </div>
+
+              <button
+                onClick={handleShare}
+                className="w-full border-2 border-gray-300 text-gray-700 py-3 px-6 rounded-xl font-semibold transition-all duration-300 hover:border-blue-500 hover:text-blue-600 flex items-center justify-center gap-3"
+              >
+                <Copy className="w-4 h-4" />
+                Share Product
+              </button>
+
               {quantity === currentProduct.stock && currentProduct.stock > 0 && (
                 <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
                   <p className="text-amber-800 text-sm font-medium">
                     Maximum quantity reached! Only {currentProduct.stock} items available.
+                  </p>
+                </div>
+              )}
+
+              {currentProduct.stock === 0 && (
+                <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+                  <p className="text-red-800 text-sm font-medium">
+                    This product is currently out of stock.
                   </p>
                 </div>
               )}
@@ -173,13 +305,11 @@ const ProductDetails: React.FC = () => {
           </div>
         </div>
 
-        {/* Product Details */}
         <div className="mt-16">
           <ProductDescription product={currentProduct} />
         </div>
       </div>
 
-      {/* Custom CSS for animations */}
       <style jsx>{`
         @keyframes fade-in {
           from { opacity: 0; transform: translateY(-10px); }

@@ -1,19 +1,29 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Minus, Plus, Trash2, MapPin, Phone, Home } from 'lucide-react';
+import { Minus, Plus, Trash2, MapPin, Phone, Home, Download } from 'lucide-react';
 import Swal from 'sweetalert2';
 import toast, { Toaster } from 'react-hot-toast';
+import axios from 'axios';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 
 interface CartItem {
-  id: string;
-  name: string;
-  price: number;
-  originalPrice?: number;
-  image: string;
+  product: {
+    _id: string;
+    name: string;
+    price: string;
+    originalPrice?: string;
+    discount?: number;
+    images: string[];
+    stock: number;
+    category: string;
+    colors: Array<{ value: string; name: string }>;
+  };
   quantity: number;
-  stock: number;
-  category: string;
+  selectedColor: string;
+  selectedColorName: string;
+  addedAt: string;
 }
 
 interface DeliveryAddress {
@@ -25,40 +35,21 @@ interface DeliveryAddress {
   street: string;
 }
 
-const CartPage = () => {
-  const [cartItems, setCartItems] = useState<CartItem[]>([
-    {
-      id: '1',
-      name: 'Premium Leather Backpack',
-      price: 189,
-      originalPrice: 249,
-      image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=150&h=150&fit=crop',
-      quantity: 1,
-      stock: 15,
-      category: 'Bags'
-    },
-    {
-      id: '2',
-      name: 'Designer Crossbody Handbag',
-      price: 129,
-      originalPrice: 179,
-      image: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=150&h=150&fit=crop',
-      quantity: 2,
-      stock: 20,
-      category: 'Bags'
-    },
-    {
-      id: '3',
-      name: 'Floral Summer Maxi Dress',
-      price: 59,
-      originalPrice: 89,
-      image: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=150&h=150&fit=crop',
-      quantity: 1,
-      stock: 25,
-      category: 'Clothing'
-    }
-  ]);
+interface OrderData {
+  customerInfo: DeliveryAddress;
+  items: CartItem[];
+  deliveryLocation: string;
+  subtotal: number;
+  deliveryCharge: number;
+  grandTotal: number;
+  orderDate: string;
+  paymentMethod: string;
+  status: string;
+  orderNumber: string;
+}
 
+const CartPage = () => {
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [deliveryLocation, setDeliveryLocation] = useState<'dhaka' | 'outside'>('dhaka');
   const [deliveryAddress, setDeliveryAddress] = useState<DeliveryAddress>({
     name: '',
@@ -68,35 +59,59 @@ const CartPage = () => {
     houseNumber: '',
     street: ''
   });
+  const [orderData, setOrderData] = useState<OrderData | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Calculate totals
-  const subtotal = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+  useEffect(() => {
+    const loadCartItems = () => {
+      try {
+        const savedCart = localStorage.getItem('allmart-cart');
+        if (savedCart) {
+          const parsedCart = JSON.parse(savedCart);
+          setCartItems(parsedCart || []);
+        }
+      } catch (error) {
+        console.error('Error loading cart from localStorage:', error);
+        toast.error('Failed to load cart items');
+        setCartItems([]);
+      }
+    };
+
+    loadCartItems();
+  }, []);
+
+  useEffect(() => {
+    if (cartItems.length > 0) {
+      localStorage.setItem('allmart-cart', JSON.stringify(cartItems));
+    }
+  }, [cartItems]);
+
+  const subtotal = cartItems.reduce((total, item) => total + (parseFloat(item.product.price) * item.quantity), 0);
   const deliveryCharge = deliveryLocation === 'dhaka' ? 100 : 150;
   const grandTotal = subtotal + deliveryCharge;
 
-  // Update quantity
-  const updateQuantity = (id: string, newQuantity: number) => {
+  const updateQuantity = (productId: string, color: string, newQuantity: number) => {
     if (newQuantity < 1) return;
 
-    const item = cartItems.find(item => item.id === id);
-    if (item && newQuantity > item.stock) {
-      toast.error(`Only ${item.stock} items available in stock`);
+    const item = cartItems.find(item => item.product._id === productId && item.selectedColor === color);
+    if (item && newQuantity > item.product.stock) {
+      toast.error(`Only ${item.product.stock} items available in stock`);
       return;
     }
 
     setCartItems(prev =>
       prev.map(item =>
-        item.id === id ? { ...item, quantity: newQuantity } : item
+        item.product._id === productId && item.selectedColor === color
+          ? { ...item, quantity: newQuantity }
+          : item
       )
     );
-    toast.success('Quantity updated');
   };
 
-  // Remove item from cart
-  const removeFromCart = (id: string) => {
+  const removeFromCart = (productId: string, color: string) => {
     Swal.fire({
       title: 'Are you sure?',
-      text: "You won't be able to revert this!",
+      text: "This item will be removed from your cart!",
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
@@ -104,13 +119,34 @@ const CartPage = () => {
       confirmButtonText: 'Yes, remove it!'
     }).then((result) => {
       if (result.isConfirmed) {
-        setCartItems(prev => prev.filter(item => item.id !== id));
+        setCartItems(prev =>
+          prev.filter(item => !(item.product._id === productId && item.selectedColor === color))
+        );
         toast.success('Item removed from cart');
       }
     });
   };
 
-  // Handle address change
+  const changeColor = (productId: string, oldColor: string, newColor: string, newColorName: string) => {
+    const existingItemWithNewColor = cartItems.find(
+      item => item.product._id === productId && item.selectedColor === newColor
+    );
+
+    if (existingItemWithNewColor) {
+      toast.error('This color variant is already in your cart');
+      return;
+    }
+
+    setCartItems(prev =>
+      prev.map(item =>
+        item.product._id === productId && item.selectedColor === oldColor
+          ? { ...item, selectedColor: newColor, selectedColorName: newColorName }
+          : item
+      )
+    );
+    toast.success('Color changed successfully');
+  };
+
   const handleAddressChange = (field: keyof DeliveryAddress, value: string) => {
     setDeliveryAddress(prev => ({
       ...prev,
@@ -118,7 +154,6 @@ const CartPage = () => {
     }));
   };
 
-  // Validate form
   const validateForm = () => {
     if (!deliveryAddress.name.trim()) {
       toast.error('Please enter your name');
@@ -143,48 +178,114 @@ const CartPage = () => {
     return true;
   };
 
-  // Checkout
-  const handleCheckout = () => {
-    if (!validateForm()) return;
-
-    Swal.fire({
-      title: 'Confirm Order?',
-      html: `
-        <div class="text-left">
-          <p><strong>Total Items:</strong> ${cartItems.reduce((sum, item) => sum + item.quantity, 0)}</p>
-          <p><strong>Subtotal:</strong> ৳${subtotal}</p>
-          <p><strong>Delivery:</strong> ৳${deliveryCharge}</p>
-          <p><strong>Grand Total:</strong> ৳${grandTotal}</p>
-          <p><strong>Delivery to:</strong> ${deliveryAddress.zela}, ${deliveryAddress.upozela}</p>
-        </div>
-      `,
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, place order!',
-      cancelButtonText: 'Cancel'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        Swal.fire(
-          'Order Placed!',
-          'Your order has been successfully placed.',
-          'success'
-        );
-
-        console.log('Order details:', {
-          items: cartItems,
-          address: deliveryAddress,
-          deliveryLocation,
-          subtotal,
-          deliveryCharge,
-          grandTotal
-        });
-      }
-    });
+  const generateOrderNumber = () => {
+    return 'ORD-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9).toUpperCase();
   };
 
-  if (cartItems.length === 0) {
+  const submitOrder = async () => {
+    if (!validateForm()) return;
+
+    setIsSubmitting(true);
+
+    const orderData: OrderData = {
+      customerInfo: deliveryAddress,
+      items: cartItems,
+      deliveryLocation: deliveryLocation,
+      subtotal: subtotal,
+      deliveryCharge: deliveryCharge,
+      grandTotal: grandTotal,
+      orderDate: new Date().toISOString(),
+      paymentMethod: 'Cash on Delivery',
+      status: 'pending',
+      orderNumber: generateOrderNumber()
+    };
+
+    try {
+      const response = await axios.post('https://all-mart-avenue-backend.vercel.app/orders', orderData);
+
+      if (response.status === 201) {
+        setOrderData(orderData);
+
+        Swal.fire({
+          title: '🎉 Order Placed Successfully!',
+          html: `
+            <div class="text-center">
+              <div class="text-6xl mb-4">🥳</div>
+              <h3 class="text-xl font-bold text-green-600 mb-2">Thank You for Your Order!</h3>
+              <p class="text-gray-600 mb-4">Your order has been confirmed and will be delivered soon.</p>
+              <div class="bg-gray-100 p-4 rounded-lg text-left">
+                <p><strong>Order Number:</strong> ${orderData.orderNumber}</p>
+                <p><strong>Total Amount:</strong> ৳${grandTotal.toFixed(2)}</p>
+                <p><strong>Payment Method:</strong> Cash on Delivery</p>
+                <p><strong>Delivery to:</strong> ${deliveryAddress.zela}, ${deliveryAddress.upozela}</p>
+              </div>
+            </div>
+          `,
+          icon: 'success',
+          showCancelButton: true,
+          confirmButtonText: 'Download Invoice',
+          cancelButtonText: 'Continue Shopping',
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+        }).then((result) => {
+          if (result.isConfirmed) {
+            downloadInvoice();
+          }
+          setCartItems([]);
+          localStorage.removeItem('allmart-cart');
+        });
+      }
+    } catch (error) {
+      console.error('Error submitting order:', error);
+      toast.error('Failed to place order. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const downloadInvoice = () => {
+    const invoiceElement = document.getElementById('invoice');
+
+    if (invoiceElement) {
+      html2canvas(invoiceElement).then((canvas) => {
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jsPDF();
+        const imgWidth = 190;
+        const pageHeight = 295;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        let heightLeft = imgHeight;
+
+        let position = 10;
+
+        pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+
+        while (heightLeft >= 0) {
+          position = heightLeft - imgHeight;
+          pdf.addPage();
+          pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+          heightLeft -= pageHeight;
+        }
+
+        pdf.save(`invoice-${orderData?.orderNumber}.pdf`);
+      });
+    }
+  };
+
+  const downloadAsPNG = () => {
+    const invoiceElement = document.getElementById('invoice');
+
+    if (invoiceElement) {
+      html2canvas(invoiceElement).then((canvas) => {
+        const link = document.createElement('a');
+        link.download = `invoice-${orderData?.orderNumber}.png`;
+        link.href = canvas.toDataURL();
+        link.click();
+      });
+    }
+  };
+
+  if (cartItems.length === 0 && !orderData) {
     return (
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="container mx-auto px-4">
@@ -193,7 +294,7 @@ const CartPage = () => {
             <h2 className="text-2xl font-bold text-gray-800 mb-4">Your cart is empty</h2>
             <p className="text-gray-600 mb-8">Add some products to your cart to see them here.</p>
             <button
-              onClick={() => window.history.back()}
+              onClick={() => window.location.href = '/products'}
               className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
             >
               Continue Shopping
@@ -205,47 +306,199 @@ const CartPage = () => {
     );
   }
 
+  if (orderData) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-8">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-8">
+              <div className="text-6xl mb-4">🎉</div>
+              <h1 className="text-3xl font-bold text-green-600 mb-2">Order Placed Successfully!</h1>
+              <p className="text-gray-600 mb-6">Thank you for shopping with us. Your order is being processed.</p>
+
+              <div className="flex gap-4 justify-center mb-8">
+                <button
+                  onClick={downloadInvoice}
+                  className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+                >
+                  <Download className="w-4 h-4" />
+                  Download PDF Invoice
+                </button>
+                <button
+                  onClick={downloadAsPNG}
+                  className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2"
+                >
+                  <Download className="w-4 h-4" />
+                  Download PNG
+                </button>
+                <button
+                  onClick={() => window.location.href = '/products'}
+                  className="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors"
+                >
+                  Continue Shopping
+                </button>
+              </div>
+            </div>
+
+            {/* Invoice */}
+            <div id="invoice" className="bg-white rounded-lg shadow-lg p-8 mb-8">
+              <div className="text-center mb-8">
+                <h2 className="text-2xl font-bold text-gray-800">AllMart Avenue</h2>
+                <p className="text-gray-600">Invoice</p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-8 mb-8">
+                <div>
+                  <h3 className="font-semibold text-gray-800 mb-2">Order Information</h3>
+                  <p><strong>Order Number:</strong> {orderData.orderNumber}</p>
+                  <p><strong>Order Date:</strong> {new Date(orderData.orderDate).toLocaleDateString()}</p>
+                  <p><strong>Payment Method:</strong> {orderData.paymentMethod}</p>
+                  <p><strong>Status:</strong> <span className="text-green-600 font-semibold">Confirmed</span></p>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-800 mb-2">Delivery Information</h3>
+                  <p><strong>Name:</strong> {orderData.customerInfo.name}</p>
+                  <p><strong>Phone:</strong> {orderData.customerInfo.phone}</p>
+                  <p><strong>Address:</strong> {orderData.customerInfo.houseNumber}, {orderData.customerInfo.street}</p>
+                  <p><strong>Area:</strong> {orderData.customerInfo.upozela}, {orderData.customerInfo.zela}</p>
+                  <p><strong>Delivery:</strong> {orderData.deliveryLocation === 'dhaka' ? 'Inside Dhaka' : 'Outside Dhaka'}</p>
+                </div>
+              </div>
+
+              <div className="mb-8">
+                <h3 className="font-semibold text-gray-800 mb-4">Order Items</h3>
+                <div className="border rounded-lg">
+                  <div className="grid grid-cols-12 gap-4 p-4 bg-gray-50 font-semibold">
+                    <div className="col-span-5">Product</div>
+                    <div className="col-span-2">Color</div>
+                    <div className="col-span-2 text-center">Quantity</div>
+                    <div className="col-span-3 text-right">Price</div>
+                  </div>
+                  {orderData.items.map((item, index) => (
+                    <div key={index} className="grid grid-cols-12 gap-4 p-4 border-t">
+                      <div className="col-span-5">
+                        <p className="font-semibold">{item.product.name}</p>
+                        <p className="text-sm text-gray-600">{item.product.category}</p>
+                      </div>
+                      <div className="col-span-2">
+                        <div className="flex items-center gap-2">
+                          <div
+                            className="w-4 h-4 rounded-full border"
+                            style={{ backgroundColor: item.selectedColor }}
+                          />
+                          <span className="text-sm">{item.selectedColorName}</span>
+                        </div>
+                      </div>
+                      <div className="col-span-2 text-center">{item.quantity}</div>
+                      <div className="col-span-3 text-right">
+                        ৳{(parseFloat(item.product.price) * item.quantity).toFixed(2)}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="border-t pt-4">
+                <div className="flex justify-between mb-2">
+                  <span>Subtotal:</span>
+                  <span>৳{orderData.subtotal.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between mb-2">
+                  <span>Delivery Charge:</span>
+                  <span>৳{orderData.deliveryCharge}</span>
+                </div>
+                <div className="flex justify-between text-lg font-bold">
+                  <span>Grand Total:</span>
+                  <span className="text-blue-600">৳{orderData.grandTotal.toFixed(2)}</span>
+                </div>
+              </div>
+
+              <div className="mt-8 text-center text-gray-500 text-sm">
+                <p>Thank you for your order! We'll contact you soon for delivery.</p>
+                <p>For any queries, contact: 017XXXXXXXX</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-4">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold text-gray-800">Shopping Cart</h1>
+        </div>
+
         <div className="flex flex-col lg:flex-row gap-8">
-          {/* Left Column - Cart Items & Address */}
           <div className="lg:w-2/3 space-y-6">
-            {/* Cart Items */}
             <div className="bg-white rounded-lg shadow-md p-6">
-              <h2 className="text-2xl font-bold text-gray-800 mb-6">Shopping Cart ({cartItems.length} items)</h2>
+              <h2 className="text-2xl font-bold text-gray-800 mb-6">
+                Cart Items ({cartItems.reduce((sum, item) => sum + item.quantity, 0)} items)
+              </h2>
 
               <div className="space-y-4">
                 {cartItems.map((item) => (
-                  <div key={item.id} className="flex items-center gap-4 pb-4 border-b border-gray-200 last:border-b-0">
-                    {/* Product Image */}
+                  <div key={`${item.product._id}-${item.selectedColor}`} className="flex items-center gap-4 pb-4 border-b border-gray-200 last:border-b-0">
                     <div className="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
                       <img
-                        src={item.image}
-                        alt={item.name}
+                        src={item.product.images[0]}
+                        alt={item.product.name}
                         className="w-full h-full object-cover"
                       />
                     </div>
 
-                    {/* Product Details */}
                     <div className="flex-grow">
-                      <h3 className="font-semibold text-gray-800">{item.name}</h3>
-                      <p className="text-sm text-gray-600">{item.category}</p>
-                      <p className="text-sm text-gray-500">Stock: {item.stock}</p>
+                      <h3 className="font-semibold text-gray-800">{item.product.name}</h3>
+                      <p className="text-sm text-gray-600">{item.product.category}</p>
 
-                      {/* Price */}
+                      <div className="flex items-center gap-2 mt-2">
+                        <div className="flex items-center gap-2">
+                          <div
+                            className="w-4 h-4 rounded-full border border-gray-300"
+                            style={{ backgroundColor: item.selectedColor }}
+                            title={item.selectedColorName}
+                          />
+                          <span className="text-sm text-gray-500">{item.selectedColorName}</span>
+                        </div>
+
+                        {item.product.colors && item.product.colors.length > 1 && (
+                          <div className="flex gap-1 ml-4">
+                            {item.product.colors.map((color) => (
+                              <button
+                                key={color.value}
+                                onClick={() => changeColor(item.product._id, item.selectedColor, color.value, color.name)}
+                                className={`w-4 h-4 rounded-full border-2 transition-all ${item.selectedColor === color.value
+                                  ? 'border-blue-500 ring-2 ring-blue-200'
+                                  : 'border-gray-300 hover:border-gray-400'
+                                  }`}
+                                style={{ backgroundColor: color.value }}
+                                title={color.name}
+                              />
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
+                      <p className="text-sm text-gray-500 mt-1">Stock: {item.product.stock}</p>
+
                       <div className="flex items-center gap-2 mt-1">
-                        <span className="text-lg font-bold text-blue-600">৳{item.price}</span>
-                        {item.originalPrice && (
-                          <span className="text-sm text-gray-500 line-through">৳{item.originalPrice}</span>
+                        <span className="text-lg font-bold text-blue-600">৳{item.product.price}</span>
+                        {item.product.originalPrice && item.product.originalPrice !== item.product.price && (
+                          <span className="text-sm text-gray-500 line-through">৳{item.product.originalPrice}</span>
+                        )}
+                        {item.product.discount && item.product.discount > 0 && (
+                          <span className="text-xs bg-red-100 text-red-800 px-2 py-1 rounded-full">
+                            {item.product.discount}% OFF
+                          </span>
                         )}
                       </div>
                     </div>
 
-                    {/* Quantity Controls */}
                     <div className="flex items-center gap-3">
                       <button
-                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                        onClick={() => updateQuantity(item.product._id, item.selectedColor, item.quantity - 1)}
                         className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100 transition-colors"
                         disabled={item.quantity <= 1}
                       >
@@ -255,22 +508,24 @@ const CartPage = () => {
                       <span className="w-8 text-center font-semibold">{item.quantity}</span>
 
                       <button
-                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                        onClick={() => updateQuantity(item.product._id, item.selectedColor, item.quantity + 1)}
                         className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100 transition-colors"
-                        disabled={item.quantity >= item.stock}
+                        disabled={item.quantity >= item.product.stock}
                       >
                         <Plus className="w-4 h-4" />
                       </button>
                     </div>
 
-                    {/* Total Price & Remove */}
                     <div className="text-right">
-                      <p className="font-semibold text-gray-800">৳{(item.price * item.quantity).toFixed(2)}</p>
+                      <p className="font-semibold text-gray-800">
+                        ৳{(parseFloat(item.product.price) * item.quantity).toFixed(2)}
+                      </p>
                       <button
-                        onClick={() => removeFromCart(item.id)}
-                        className="text-red-500 hover:text-red-700 transition-colors mt-2"
+                        onClick={() => removeFromCart(item.product._id, item.selectedColor)}
+                        className="text-red-500 hover:text-red-700 transition-colors mt-2 flex items-center gap-1"
                       >
                         <Trash2 className="w-4 h-4" />
+                        Remove
                       </button>
                     </div>
                   </div>
@@ -278,7 +533,6 @@ const CartPage = () => {
               </div>
             </div>
 
-            {/* Delivery Location */}
             <div className="bg-white rounded-lg shadow-md p-6">
               <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
                 <MapPin className="w-5 h-5" />
@@ -311,7 +565,6 @@ const CartPage = () => {
                 </label>
               </div>
 
-              {/* Delivery Address Form */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -396,7 +649,6 @@ const CartPage = () => {
             </div>
           </div>
 
-          {/* Right Column - Order Summary */}
           <div className="lg:w-1/3">
             <div className="bg-white rounded-lg shadow-md p-6 sticky top-4">
               <h3 className="text-xl font-bold text-gray-800 mb-6">Order Summary</h3>
@@ -421,10 +673,11 @@ const CartPage = () => {
               </div>
 
               <button
-                onClick={handleCheckout}
-                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105"
+                onClick={submitOrder}
+                disabled={isSubmitting}
+                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Proceed to Checkout
+                {isSubmitting ? 'Placing Order...' : 'Proceed to Checkout'}
               </button>
 
               <p className="text-xs text-gray-500 text-center mt-4">
@@ -435,7 +688,6 @@ const CartPage = () => {
         </div>
       </div>
 
-      {/* Toast Notifications */}
       <Toaster
         position="top-right"
         toastOptions={{
@@ -446,10 +698,6 @@ const CartPage = () => {
           },
           success: {
             duration: 3000,
-            theme: {
-              primary: 'green',
-              secondary: 'black',
-            },
           },
           error: {
             duration: 4000,
