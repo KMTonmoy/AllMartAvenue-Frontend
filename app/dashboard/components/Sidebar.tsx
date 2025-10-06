@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+import axios from 'axios';
 import {
   Sheet,
   SheetContent,
@@ -29,7 +30,32 @@ import {
   Sparkles,
   Clock,
   GripVertical,
+  RefreshCw,
 } from 'lucide-react';
+
+interface Banner {
+  _id: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  buttonText: string;
+  image: string;
+}
+
+interface MenuItem {
+  name: string;
+  href: string;
+  icon: any;
+  badge: number | null;
+  subItems?: SubMenuItem[];
+}
+
+interface SubMenuItem {
+  name: string;
+  href: string;
+  icon: any;
+  badge: number | null;
+}
 
 const menuItems = [
   {
@@ -94,16 +120,16 @@ const menuItems = [
     name: 'Banners',
     href: '/dashboard/banners',
     icon: Image,
-    badge: 5,
+    badge: 0, // Will be updated dynamically
   },
 ];
 
+// Fixed variants with proper TypeScript types
 const sidebarVariants = {
   hidden: { x: -300, opacity: 0 },
   visible: {
     x: 0,
     opacity: 1,
-    transition: { type: "spring", stiffness: 300, damping: 30 }
   }
 };
 
@@ -118,7 +144,7 @@ const subItemVariants = {
 };
 
 interface NavItemProps {
-  item: any;
+  item: MenuItem;
   index: number;
   isActive: boolean;
   hasSubItems: boolean;
@@ -126,6 +152,10 @@ interface NavItemProps {
   toggleExpanded: (name: string) => void;
   mobile: boolean;
   setOpen: (open: boolean) => void;
+}
+
+interface SidebarProps {
+  onLogout?: () => void;
 }
 
 const NavItem = ({ item, index, isActive, hasSubItems, expandedItems, toggleExpanded, mobile, setOpen }: NavItemProps) => {
@@ -138,7 +168,7 @@ const NavItem = ({ item, index, isActive, hasSubItems, expandedItems, toggleExpa
         variants={itemVariants}
         initial="hidden"
         animate="visible"
-        transition={{ delay: 0.1 + index * 0.1 }}
+        transition={{ delay: 0.1 + index * 0.1, duration: 0.4, ease: "easeOut" }}
       >
         <Button
           variant={isActive ? "secondary" : "ghost"}
@@ -157,7 +187,7 @@ const NavItem = ({ item, index, isActive, hasSubItems, expandedItems, toggleExpa
             <motion.div
               initial={{ scale: 0.8 }}
               animate={{ scale: 1 }}
-              transition={{ delay: 0.2 + index * 0.1 }}
+              transition={{ delay: 0.2 + index * 0.1, duration: 0.3 }}
             >
               <Icon className="h-4 w-4" />
             </motion.div>
@@ -165,7 +195,7 @@ const NavItem = ({ item, index, isActive, hasSubItems, expandedItems, toggleExpa
           </div>
 
           <div className="flex items-center space-x-2 z-10 relative">
-            {item.badge && (
+            {item.badge && item.badge > 0 && (
               <Badge variant="default" className="h-5 px-1 text-xs bg-red-500">
                 {item.badge}
               </Badge>
@@ -186,9 +216,10 @@ const NavItem = ({ item, index, isActive, hasSubItems, expandedItems, toggleExpa
               initial="hidden"
               animate="visible"
               exit="hidden"
+              transition={{ duration: 0.3, ease: "easeOut" }}
               className="ml-6 mt-1 space-y-1 border-l-2 border-gray-100 pl-3"
             >
-              {item.subItems.map((subItem: any, subIndex: number) => {
+              {item.subItems?.map((subItem: SubMenuItem, subIndex: number) => {
                 const SubIcon = subItem.icon;
                 const isSubActive = pathname === subItem.href;
 
@@ -197,7 +228,7 @@ const NavItem = ({ item, index, isActive, hasSubItems, expandedItems, toggleExpa
                     key={subItem.name}
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: subIndex * 0.05 }}
+                    transition={{ delay: subIndex * 0.05, duration: 0.3 }}
                   >
                     <Link
                       href={subItem.href}
@@ -218,7 +249,7 @@ const NavItem = ({ item, index, isActive, hasSubItems, expandedItems, toggleExpa
                           <SubIcon className="h-3 w-3" />
                           <span>{subItem.name}</span>
                         </div>
-                        {subItem.badge && (
+                        {subItem.badge && subItem.badge > 0 && (
                           <Badge variant="outline" className="h-4 px-1 text-xs ml-auto z-10">
                             {subItem.badge}
                           </Badge>
@@ -240,7 +271,7 @@ const NavItem = ({ item, index, isActive, hasSubItems, expandedItems, toggleExpa
       variants={itemVariants}
       initial="hidden"
       animate="visible"
-      transition={{ delay: 0.1 + index * 0.1 }}
+      transition={{ delay: 0.1 + index * 0.1, duration: 0.4, ease: "easeOut" }}
     >
       <Link
         href={item.href}
@@ -262,15 +293,19 @@ const NavItem = ({ item, index, isActive, hasSubItems, expandedItems, toggleExpa
             <motion.div
               initial={{ scale: 0.8 }}
               animate={{ scale: 1 }}
-              transition={{ delay: 0.2 + index * 0.1 }}
+              transition={{ delay: 0.2 + index * 0.1, duration: 0.3 }}
             >
               <Icon className="h-4 w-4" />
             </motion.div>
             <span className="font-medium">{item.name}</span>
           </div>
 
-          {item.badge && (
-            <Badge variant="default" className="h-5 px-1 text-xs bg-red-500 ml-auto z-10">
+          {item.badge !== null && item.badge > 0 && (
+            <Badge
+              variant="default"
+              className={`h-5 px-1 text-xs ml-auto z-10 ${item.name === 'Banners' ? 'bg-gradient-to-r from-green-500 to-blue-500' : 'bg-red-500'
+                }`}
+            >
               {item.badge}
             </Badge>
           )}
@@ -280,9 +315,42 @@ const NavItem = ({ item, index, isActive, hasSubItems, expandedItems, toggleExpa
   );
 };
 
-const NavContent = ({ mobile = false, setOpen, width = 320 }: { mobile?: boolean; setOpen: (open: boolean) => void; width?: number }) => {
+const NavContent = ({ mobile = false, setOpen, width = 320, onLogout }: { mobile?: boolean; setOpen: (open: boolean) => void; width?: number; onLogout?: () => void }) => {
   const [expandedItems, setExpandedItems] = useState<string[]>(['Products']);
+  const [bannersCount, setBannersCount] = useState<number>(0);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
   const pathname = usePathname();
+
+  // Update menu items with dynamic banner count
+  const updatedMenuItems = menuItems.map(item =>
+    item.name === 'Banners'
+      ? { ...item, badge: bannersCount }
+      : item
+  );
+
+  const fetchBannersCount = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get<Banner[]>('http://localhost:8000/banners');
+      setBannersCount(response.data.length);
+      setLastUpdated(new Date());
+    } catch (error) {
+      console.error('Error fetching banners count:', error);
+      setBannersCount(0);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchBannersCount();
+
+    // Refresh banners count every 30 seconds
+    const interval = setInterval(fetchBannersCount, 30000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   const toggleExpanded = (itemName: string) => {
     setExpandedItems(prev =>
@@ -293,7 +361,16 @@ const NavContent = ({ mobile = false, setOpen, width = 320 }: { mobile?: boolean
   };
 
   const isActive = (href: string) => pathname === href;
-  const isSubItemActive = (subItems: any[]) => subItems.some((subItem: any) => pathname === subItem.href);
+  const isSubItemActive = (subItems: SubMenuItem[] = []) =>
+    subItems.some((subItem: SubMenuItem) => pathname === subItem.href);
+
+  const formatTime = (date: Date) => {
+    return date.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    });
+  };
 
   return (
     <motion.div
@@ -301,6 +378,7 @@ const NavContent = ({ mobile = false, setOpen, width = 320 }: { mobile?: boolean
       variants={sidebarVariants}
       initial="hidden"
       animate="visible"
+      transition={{ type: "spring", stiffness: 300, damping: 30, duration: 0.6 }}
       style={!mobile ? { width: `${width}px` } : {}}
     >
       <div className="flex items-center justify-between p-6 border-b bg-gradient-to-r from-blue-600 to-purple-600">
@@ -308,7 +386,7 @@ const NavContent = ({ mobile = false, setOpen, width = 320 }: { mobile?: boolean
           <motion.div
             initial={{ rotate: 0 }}
             animate={{ rotate: 360 }}
-            transition={{ duration: 0.8 }}
+            transition={{ duration: 0.8, ease: "easeInOut" }}
           >
             <Avatar className="h-10 w-10 bg-white/20 border-2 border-white/30">
               <AvatarFallback className="bg-transparent text-white">
@@ -337,28 +415,47 @@ const NavContent = ({ mobile = false, setOpen, width = 320 }: { mobile?: boolean
         )}
       </div>
 
-      <motion.div
-        className="p-4 bg-gradient-to-r from-green-50 to-blue-50 mx-4 mt-4 rounded-lg border"
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.3 }}
-      >
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-xs text-gray-600">Today's Revenue</p>
-            <p className="text-lg font-bold text-gray-900">$2,847</p>
-          </div>
-          <motion.div
-            animate={{ scale: [1, 1.2, 1] }}
-            transition={{ duration: 2, repeat: 1 }}
+      {/* Stats Section */}
+      <div className="p-4 border-b bg-gradient-to-r from-gray-50 to-blue-50">
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+            <TrendingUp className="h-4 w-4" />
+            Live Stats
+          </h3>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={fetchBannersCount}
+            disabled={loading}
+            className="h-6 w-6 text-gray-500 hover:text-blue-600"
           >
-            <TrendingUp className="h-6 w-6 text-green-500" />
-          </motion.div>
+            <RefreshCw className={`h-3 w-3 ${loading ? 'animate-spin' : ''}`} />
+          </Button>
         </div>
-      </motion.div>
+        <div className="space-y-2">
+          <div className="flex justify-between items-center text-xs">
+            <span className="text-gray-600">Active Banners:</span>
+            <div className="flex items-center gap-2">
+              {loading ? (
+                <div className="h-2 w-8 bg-gray-200 rounded-full animate-pulse" />
+              ) : (
+                <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                  {bannersCount}
+                </Badge>
+              )}
+            </div>
+          </div>
+          <div className="flex justify-between items-center text-xs">
+            <span className="text-gray-600">Last Updated:</span>
+            <span className="text-gray-500 text-xs">
+              {formatTime(lastUpdated)}
+            </span>
+          </div>
+        </div>
+      </div>
 
       <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-        {menuItems.map((item, index) => (
+        {updatedMenuItems.map((item, index) => (
           <NavItem
             key={item.name}
             item={item}
@@ -378,7 +475,7 @@ const NavContent = ({ mobile = false, setOpen, width = 320 }: { mobile?: boolean
           <motion.div
             initial={{ scale: 0.8 }}
             animate={{ scale: 1 }}
-            transition={{ delay: 0.9 }}
+            transition={{ delay: 0.9, duration: 0.3 }}
           >
             <Avatar className="h-9 w-9 border-2 border-blue-200">
               <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-500 text-white">
@@ -390,7 +487,13 @@ const NavContent = ({ mobile = false, setOpen, width = 320 }: { mobile?: boolean
             <p className="text-sm font-semibold text-gray-900 truncate">Admin User</p>
             <p className="text-xs text-gray-500 truncate">admin@allmart.com</p>
           </div>
-          <Button variant="ghost" size="icon" className="text-gray-500">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-gray-500 hover:text-red-600 transition-colors"
+            onClick={onLogout}
+            title="Logout"
+          >
             <LogOut className="h-4 w-4" />
           </Button>
         </div>
@@ -455,7 +558,7 @@ const ResizableSidebar = ({ children, width, onWidthChange }: { children: React.
   );
 };
 
-export default function Sidebar() {
+export default function Sidebar({ onLogout }: SidebarProps) {
   const [open, setOpen] = useState(false);
   const [sidebarWidth, setSidebarWidth] = useState(320);
 
@@ -472,14 +575,14 @@ export default function Sidebar() {
           </Button>
         </SheetTrigger>
         <SheetContent side="left" className="p-0 w-80 border-r-0 h-screen">
-          <NavContent mobile={true} setOpen={setOpen} />
+          <NavContent mobile={true} setOpen={setOpen} onLogout={onLogout} />
         </SheetContent>
       </Sheet>
 
       <div className="hidden lg:block">
         <ResizableSidebar width={sidebarWidth} onWidthChange={setSidebarWidth}>
           <div className="flex flex-col h-screen border-r bg-white shadow-xl">
-            <NavContent setOpen={setOpen} width={sidebarWidth} />
+            <NavContent setOpen={setOpen} width={sidebarWidth} onLogout={onLogout} />
           </div>
         </ResizableSidebar>
       </div>
