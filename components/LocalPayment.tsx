@@ -19,7 +19,7 @@ const LocalPayment: React.FC = () => {
     {
       id: 3,
       name: "Rocket",
-      logo: "https://images.seeklogo.com/logo-png/31/1/dutch-bangla-rocket-logo-png_seeklogo-317692.png",
+      logo: "https://play-lh.googleusercontent.com/sDY6YSDobbm_rX-aozinIX5tVYBSea1nAyXYI4TJlije2_AF5_5aG3iAS7nlrgo0lk8",
     },
     {
       id: 4,
