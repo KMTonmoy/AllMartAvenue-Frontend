@@ -55,8 +55,8 @@ const ProductDetails: React.FC = () => {
         }
 
         setError(null);
-      } catch (err) {
-        console.error('Error fetching product:', err);
+      } catch {
+        console.error('Error fetching product');
         setError('Failed to load product');
       } finally {
         setLoading(false);
@@ -85,7 +85,7 @@ const ProductDetails: React.FC = () => {
     try {
       await navigator.clipboard.writeText(productUrl);
       showNotificationMessage('Product link copied to clipboard!');
-    } catch (err) {
+    } catch {
       const textArea = document.createElement('textarea');
       textArea.value = productUrl;
       document.body.appendChild(textArea);

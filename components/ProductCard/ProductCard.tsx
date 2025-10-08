@@ -3,6 +3,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { Product } from '@/types/product';
 
 interface ProductCardProps {
@@ -18,15 +19,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0, onAddToCa
     router.push(`/product/${product._id}`);
   };
 
-  const handleAddToCart = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (onAddToCart) {
-      onAddToCart(product);
-    } else {
-      console.log("Added to cart:", product.name);
-    }
-  };
-
   return (
     <motion.div
       className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 cursor-pointer flex flex-col h-full"
@@ -37,9 +29,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0, onAddToCa
       onClick={handleProductClick}
     >
       <div className="relative overflow-hidden h-48">
-        <img
+        <Image
           src={product.images[0]}
           alt={product.name}
+          width={300}
+          height={192}
           className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
         />
         {product.discount > 0 && (
@@ -78,8 +72,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0, onAddToCa
             )}
           </div>
           <span className={`text-xs px-2 py-1 rounded-full ${product.stock > 10 ? 'bg-green-100 text-green-800' :
-              product.stock > 5 ? 'bg-yellow-100 text-yellow-800' :
-                'bg-red-100 text-red-800'
+            product.stock > 5 ? 'bg-yellow-100 text-yellow-800' :
+              'bg-red-100 text-red-800'
             }`}>
             {product.stock} left
           </span>
@@ -106,7 +100,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0, onAddToCa
           </div>
         )}
 
-    
+
       </div>
     </motion.div>
   );

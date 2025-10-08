@@ -18,6 +18,21 @@ import {
 import { cn } from "@/lib/utils";
 import { GoogleTranslate } from "./GoogleTranslate";
 
+interface CartItem {
+  product: {
+    _id: string;
+    name: string;
+    price: string;
+    images: string[];
+    stock: number;
+    category: string;
+  };
+  quantity: number;
+  selectedColor: string;
+  selectedColorName: string;
+  addedAt: string;
+}
+
 const Navbar = () => {
   const [cartItemsCount, setCartItemsCount] = useState(0);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -36,8 +51,8 @@ const Navbar = () => {
       try {
         const savedCart = localStorage.getItem('allmart-cart');
         if (savedCart) {
-          const cartItems = JSON.parse(savedCart);
-          const totalItems = cartItems.reduce((sum: number, item: any) => sum + item.quantity, 0);
+          const cartItems: CartItem[] = JSON.parse(savedCart);
+          const totalItems = cartItems.reduce((sum: number, item: CartItem) => sum + item.quantity, 0);
           setCartItemsCount(totalItems);
         }
       } catch (error) {

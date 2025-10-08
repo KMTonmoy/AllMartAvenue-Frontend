@@ -44,19 +44,21 @@ const FlashSale = () => {
     };
 
     fetchProducts();
-  }, []);
+  }, [visibleCount]);
 
   const handleShowMore = () => {
     setShowAll(true);
     setVisibleCount(products.length);
-    setDisplayedProducts(products);
   };
 
   const handleShowLess = () => {
     setShowAll(false);
     setVisibleCount(8);
-    setDisplayedProducts(products.slice(0, 8));
   };
+
+  useEffect(() => {
+    setDisplayedProducts(products.slice(0, visibleCount));
+  }, [visibleCount, products]);
 
   const handleAddToCart = (product: Product) => {
     console.log("Added to cart:", product.name);
@@ -104,7 +106,7 @@ const FlashSale = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
         >
-          Limited time offers on our most popular products. Hurry before they're gone!
+          Limited time offers on our most popular products. Hurry before they&apos;re gone!
         </motion.p>
 
         <AnimatePresence>

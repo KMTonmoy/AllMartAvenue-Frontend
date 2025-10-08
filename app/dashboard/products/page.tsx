@@ -35,7 +35,6 @@ import {
   Plus,
   Edit,
   Trash2,
-  Eye,
   Package,
   Filter,
   RefreshCw,
@@ -47,10 +46,10 @@ import {
   X,
   Youtube,
   Palette,
-  Image
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Swal from 'sweetalert2';
+import Image from 'next/image';
 
 interface ProductColor {
   value: string;
@@ -306,7 +305,7 @@ const AllProducts = () => {
   const handleDelete = async (product: Product) => {
     const result = await Swal.fire({
       title: 'Are you sure?',
-      text: `You are about to delete "${product.name}". This action cannot be undone!`,
+      text: `You are about to delete &quot;${product.name}&quot;. This action cannot be undone!`,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#dc2626',
@@ -486,8 +485,8 @@ const AllProducts = () => {
       return matchesSearch && matchesCategory;
     })
     .sort((a, b) => {
-      let aValue = a[sortField];
-      let bValue = b[sortField];
+      const aValue = a[sortField];
+      const bValue = b[sortField];
 
       if (typeof aValue === 'string' && typeof bValue === 'string') {
         return sortDirection === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
@@ -630,7 +629,13 @@ const AllProducts = () => {
             <TableBody>{filteredAndSortedProducts.map((product) => (
               <TableRow key={product._id} className="hover:bg-muted/50">
                 <TableCell className="font-medium"><div className="flex items-center gap-3">
-                  <img src={product.images[0]} alt={product.name} className="w-10 h-10 rounded-md object-cover border" />
+                  <Image
+                    src={product.images[0]}
+                    alt={product.name}
+                    width={40}
+                    height={40}
+                    className="w-10 h-10 rounded-md object-cover border"
+                  />
                   <div className="flex-1 min-w-0"><p className="font-semibold truncate">{product.name}</p></div>
                 </div></TableCell>
                 <TableCell><Badge variant={getCategoryBadgeVariant(product.category)}>{product.category}</Badge></TableCell>
@@ -732,7 +737,13 @@ const AllProducts = () => {
               <div className="grid grid-cols-3 gap-2 mt-2">
                 {[0, 1, 2].map((index) => (<div key={index} className="relative">
                   {newProduct.images[index] ? (<>
-                    <img src={newProduct.images[index]} alt={`Product ${index + 1}`} className="w-full h-20 object-cover rounded-md border" />
+                    <Image
+                      src={newProduct.images[index]}
+                      alt={`Product ${index + 1}`}
+                      width={100}
+                      height={80}
+                      className="w-full h-20 object-cover rounded-md border"
+                    />
                     <Button variant="destructive" size="sm" className="absolute -top-2 -right-2 h-6 w-6 p-0 rounded-full"
                       onClick={() => removeImage(index, true)}><X className="h-3 w-3" /></Button>
                   </>) : (<div className="w-full h-20 border-2 border-dashed border-muted-foreground/25 rounded-md flex items-center justify-center cursor-pointer hover:border-muted-foreground/50 transition-colors"
@@ -863,7 +874,13 @@ const AllProducts = () => {
                 <div className="grid grid-cols-3 gap-2 mt-2">
                   {[0, 1, 2].map((index) => (<div key={index} className="relative">
                     {editingProduct.images[index] ? (<>
-                      <img src={editingProduct.images[index]} alt={`Product ${index + 1}`} className="w-full h-20 object-cover rounded-md border" />
+                      <Image
+                        src={editingProduct.images[index]}
+                        alt={`Product ${index + 1}`}
+                        width={100}
+                        height={80}
+                        className="w-full h-20 object-cover rounded-md border"
+                      />
                       <Button variant="destructive" size="sm" className="absolute -top-2 -right-2 h-6 w-6 p-0 rounded-full"
                         onClick={() => removeImage(index)}><X className="h-3 w-3" /></Button>
                     </>) : (<div className="w-full h-20 border-2 border-dashed border-muted-foreground/25 rounded-md flex items-center justify-center cursor-pointer hover:border-muted-foreground/50 transition-colors"
@@ -933,9 +950,23 @@ const AllProducts = () => {
               <DialogDescription>Complete product details and information</DialogDescription>
             </DialogHeader>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div><img src={selectedProduct.images[0]} alt={selectedProduct.name} className="w-full h-64 object-cover rounded-lg mb-4 border" />
+              <div>
+                <Image
+                  src={selectedProduct.images[0]}
+                  alt={selectedProduct.name}
+                  width={400}
+                  height={256}
+                  className="w-full h-64 object-cover rounded-lg mb-4 border"
+                />
                 <div className="grid grid-cols-3 gap-2">{selectedProduct.images.slice(1).map((image, index) => (
-                  <img key={index} src={image} alt={`${selectedProduct.name} ${index + 2}`} className="w-full h-20 object-cover rounded-md border" />
+                  <Image
+                    key={index}
+                    src={image}
+                    alt={`${selectedProduct.name} ${index + 2}`}
+                    width={100}
+                    height={80}
+                    className="w-full h-20 object-cover rounded-md border"
+                  />
                 ))}</div>
                 {selectedProduct.videoURL && (<div className="mt-4"><h4 className="font-semibold mb-2 flex items-center gap-2"><Youtube className="h-4 w-4 text-red-600" />Product Video</h4>
                   <div className="aspect-video bg-muted rounded-lg flex items-center justify-center"><iframe src={selectedProduct.videoURL} className="w-full h-full rounded-lg" allowFullScreen /></div>
@@ -969,7 +1000,7 @@ const AllProducts = () => {
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader><AlertDialogTitle>Are you sure?</AlertDialogTitle>
-            <AlertDialogDescription>This action cannot be undone. This will permanently delete the product "{productToDelete?.name}" from your inventory.</AlertDialogDescription>
+            <AlertDialogDescription>This action cannot be undone. This will permanently delete the product &quot;{productToDelete?.name}&quot; from your inventory.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={() => productToDelete && handleDelete(productToDelete)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Delete</AlertDialogAction>

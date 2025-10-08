@@ -1,6 +1,7 @@
 'use client'
 import React from 'react';
 import { Play } from 'lucide-react';
+import Image from 'next/image';
 import { Product } from '@/types/product';
 
 interface ProductImageGalleryProps {
@@ -30,9 +31,11 @@ const ProductImageGallery: React.FC<ProductImageGalleryProps> = ({
             />
           </div>
         ) : (
-          <img
+          <Image
             src={product.images[selectedImage - 1]}
             alt={product.name}
+            width={600}
+            height={600}
             className="w-full h-full object-cover"
           />
         )}
@@ -44,8 +47,8 @@ const ProductImageGallery: React.FC<ProductImageGalleryProps> = ({
         <button
           onClick={() => setSelectedImage(0)}
           className={`aspect-square rounded-xl overflow-hidden relative transition-all duration-200 ${selectedImage === 0
-              ? 'p-1 bg-gradient-to-br from-blue-500 to-purple-600 shadow-lg'
-              : 'border-2 border-gray-200 hover:border-gray-300'
+            ? 'p-1 bg-gradient-to-br from-blue-500 to-purple-600 shadow-lg'
+            : 'border-2 border-gray-200 hover:border-gray-300'
             }`}
         >
           <div className="w-full h-full bg-gradient-to-br from-gray-800 to-gray-600 flex items-center justify-center rounded-lg">
@@ -62,13 +65,15 @@ const ProductImageGallery: React.FC<ProductImageGalleryProps> = ({
             key={index}
             onClick={() => setSelectedImage(index + 1)}
             className={`aspect-square rounded-xl overflow-hidden relative transition-all duration-200 ${selectedImage === index + 1
-                ? 'p-1 bg-gradient-to-br from-blue-500 to-purple-600 shadow-lg'
-                : 'border-2 border-gray-200 hover:border-gray-300'
+              ? 'p-1 bg-gradient-to-br from-blue-500 to-purple-600 shadow-lg'
+              : 'border-2 border-gray-200 hover:border-gray-300'
               }`}
           >
-            <img
+            <Image
               src={image}
               alt={`${product.name} view ${index + 1}`}
+              width={150}
+              height={150}
               className="w-full h-full object-cover rounded-lg"
             />
           </button>

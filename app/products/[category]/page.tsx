@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import axios from 'axios';
@@ -22,7 +22,7 @@ const CategoryPage = () => {
       .join(' ')
     : '';
 
-  const fetchCategoryProducts = async () => {
+  const fetchCategoryProducts = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -41,13 +41,13 @@ const CategoryPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [categoryName]);
 
   useEffect(() => {
     if (categoryName) {
       fetchCategoryProducts();
     }
-  }, [categoryName]);
+  }, [categoryName, fetchCategoryProducts]);
 
   const handleAddToCart = (product: Product) => {
     console.log("Added to cart:", product.name);
@@ -99,7 +99,7 @@ const CategoryPage = () => {
               No products found
             </h3>
             <p className="text-gray-600">
-              We couldn't find any products in the {formattedCategoryName.toLowerCase()} category.
+              We couldn&apos;t find any products in the {formattedCategoryName.toLowerCase()} category.
             </p>
           </motion.div>
         ) : (

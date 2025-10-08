@@ -88,7 +88,7 @@ const CartPage = () => {
   }, [cartItems]);
 
   const subtotal = cartItems.reduce((total, item) => total + (parseFloat(item.product.price) * item.quantity), 0);
-  const deliveryCharge = deliveryLocation === 'dhaka' ? 100 : 150;
+  const deliveryCharge = deliveryLocation === 'dhaka' ? 80 : 130;
   const grandTotal = subtotal + deliveryCharge;
 
   const updateQuantity = (productId: string, color: string, newQuantity: number) => {
@@ -273,8 +273,6 @@ const CartPage = () => {
     }
   };
 
-
-
   if (cartItems.length === 0 && !orderData) {
     return (
       <div className="min-h-screen bg-gray-50 py-8">
@@ -307,8 +305,12 @@ const CartPage = () => {
               <p className="text-gray-600 mb-6">Thank you for shopping with us. Your order is being processed.</p>
 
               <div className="flex gap-4 justify-center mb-8">
-
-
+                <button
+                  onClick={downloadInvoice}
+                  className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Download Invoice
+                </button>
                 <button
                   onClick={() => window.location.href = '/products'}
                   className="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors"
@@ -392,7 +394,7 @@ const CartPage = () => {
               </div>
 
               <div className="mt-8 text-center text-gray-500 text-sm">
-                <p>Thank you for your order! We'll contact you soon for delivery.</p>
+                <p>Thank you for your order! We&apos;ll contact you soon for delivery.</p>
                 <p>For any queries, contact: 017XXXXXXXX</p>
               </div>
             </div>
@@ -427,7 +429,6 @@ const CartPage = () => {
                         height={80}
                         className="w-20 h-20 rounded-lg object-cover"
                       />
-
                     </div>
 
                     <div className="flex-grow">
@@ -530,7 +531,7 @@ const CartPage = () => {
                     onChange={(e) => setDeliveryLocation(e.target.value as 'dhaka')}
                     className="text-blue-600"
                   />
-                  <span>Inside Dhaka (৳100)</span>
+                  <span>Inside Dhaka (৳80)</span>
                 </label>
 
                 <label className="flex items-center gap-2 cursor-pointer">
@@ -542,7 +543,7 @@ const CartPage = () => {
                     onChange={(e) => setDeliveryLocation(e.target.value as 'outside')}
                     className="text-blue-600"
                   />
-                  <span>Outside Dhaka (৳150)</span>
+                  <span>Outside Dhaka (৳130)</span>
                 </label>
               </div>
 

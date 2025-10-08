@@ -1,5 +1,5 @@
 'use client';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -289,23 +289,25 @@ const ResizableSidebar = ({ children, width, onWidthChange }: { children: React.
   const [isResizing, setIsResizing] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
 
-  const startResizing = (mouseDownEvent: React.MouseEvent) => {
+  const startResizing = useCallback((mouseDownEvent: React.MouseEvent) => {
     setIsResizing(true);
     mouseDownEvent.preventDefault();
-  };
+  }, []);
 
-  const stopResizing = () => {
+  const stopResizing = useCallback(() => {
     setIsResizing(false);
-  };
+  }, []);
 
-  const resize = (mouseMoveEvent: MouseEvent) => {
+  const resize = useCallback((mouseMoveEvent: MouseEvent) => {
     if (isResizing && sidebarRef.current) {
       const newWidth = mouseMoveEvent.clientX;
       const minWidth = 240;
       const maxWidth = 480;
-      if (newWidth >= minWidth && newWidth <= maxWidth) onWidthChange(newWidth);
+      if (newWidth >= minWidth && newWidth <= maxWidth) {
+        onWidthChange(newWidth);
+      }
     }
-  };
+  }, [isResizing, onWidthChange]);
 
   useEffect(() => {
     window.addEventListener('mousemove', resize);
@@ -314,7 +316,7 @@ const ResizableSidebar = ({ children, width, onWidthChange }: { children: React.
       window.removeEventListener('mousemove', resize);
       window.removeEventListener('mouseup', stopResizing);
     };
-  }, [isResizing, resize]);
+  }, [resize, stopResizing]);
 
   return (
     <div ref={sidebarRef} className="relative flex h-screen" style={{ width: `${width}px` }}>

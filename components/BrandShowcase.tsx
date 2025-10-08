@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import Image from "next/image";
 
 interface Brand {
   id: number;
@@ -36,9 +37,11 @@ const BrandShowcase: React.FC = () => {
               >
                 <div className="bg-white p-5 rounded-xl shadow-md">
                   <div className="h-16 w-32 flex items-center justify-center">
-                    <img
+                    <Image
                       src={brand.logo}
                       alt={brand.name}
+                      width={128}
+                      height={64}
                       className="max-h-16 object-contain"
                     />
                   </div>

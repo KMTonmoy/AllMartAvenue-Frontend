@@ -2,6 +2,7 @@
 
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
+import Image from "next/image";
 
 const LocalPayment: React.FC = () => {
   const paymentMethods = [
@@ -55,9 +56,11 @@ const LocalPayment: React.FC = () => {
             <div key={method.id} className="flex flex-col items-center">
               <Card className="w-full aspect-square flex items-center justify-center p-5 hover:shadow-xl transition-all duration-300 hover:-translate-y-2 group border-2 border-transparent hover:border-blue-100 bg-white/70 backdrop-blur-sm">
                 <CardContent className="flex items-center justify-center p-0 w-full h-full">
-                  <img
+                  <Image
                     src={method.logo}
                     alt={method.name}
+                    width={80}
+                    height={80}
                     className="object-contain h-full w-full transition-transform duration-300 group-hover:scale-110"
                   />
                 </CardContent>

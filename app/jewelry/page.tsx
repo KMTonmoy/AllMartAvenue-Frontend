@@ -2,12 +2,10 @@
 
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { useRouter } from "next/navigation";
- import { Product } from "@/types/product";
+import { Product } from "@/types/product";
 import ProductCard from "@/components/ProductCard/ProductCard";
 
 const Jewelry = () => {
-  const router = useRouter();
   const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {
@@ -60,7 +58,7 @@ const Jewelry = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {products.map((product, index) => (
             <ProductCard
-              key={product._id  }
+              key={product._id}
               product={product}
               index={index}
               onAddToCart={handleAddToCart}
