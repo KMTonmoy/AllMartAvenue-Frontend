@@ -4,11 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
-import {
-  Sheet,
-  SheetContent,
-  SheetTrigger,
-} from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -42,52 +38,32 @@ interface Banner {
   image: string;
 }
 
+interface SubMenuItem {
+  name: string;
+  href: string;
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+  badge: number | null;
+}
+
 interface MenuItem {
   name: string;
   href: string;
-  icon: any;
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
   badge: number | null;
   subItems?: SubMenuItem[];
 }
 
-interface SubMenuItem {
-  name: string;
-  href: string;
-  icon: any;
-  badge: number | null;
-}
-
-const menuItems = [
-  {
-    name: 'Dashboard',
-    href: '/dashboard',
-    icon: Home,
-    badge: null,
-  },
+const menuItems: MenuItem[] = [
+  { name: 'Dashboard', href: '/dashboard', icon: Home, badge: null },
   {
     name: 'Products',
     href: '/dashboard/products',
     icon: Package,
     badge: 12,
     subItems: [
-      {
-        name: 'All Products',
-        href: '/dashboard/products',
-        icon: Package,
-        badge: 45
-      },
-      {
-        name: 'Add Product',
-        href: '/dashboard/products/add',
-        icon: Plus,
-        badge: null
-      },
-      {
-        name: 'Out of Stock',
-        href: '/dashboard/products/out-of-stock',
-        icon: AlertTriangle,
-        badge: 3
-      },
+      { name: 'All Products', href: '/dashboard/products', icon: Package, badge: 45 },
+      { name: 'Add Product', href: '/dashboard/products/add', icon: Plus, badge: null },
+      { name: 'Out of Stock', href: '/dashboard/products/out-of-stock', icon: AlertTriangle, badge: 3 },
     ],
   },
   {
@@ -96,52 +72,17 @@ const menuItems = [
     icon: ShoppingCart,
     badge: 8,
     subItems: [
-      {
-        name: 'All Orders',
-        href: '/dashboard/orders',
-        icon: ShoppingCart,
-        badge: 23
-      },
-      {
-        name: 'Pending Orders',
-        href: '/dashboard/orders/pending',
-        icon: Clock,
-        badge: 8
-      },
-      {
-        name: 'Delivered Orders',
-        href: '/dashboard/orders/delivered',
-        icon: CheckCircle,
-        badge: 15
-      },
+      { name: 'All Orders', href: '/dashboard/orders', icon: ShoppingCart, badge: 23 },
+      { name: 'Pending Orders', href: '/dashboard/orders/pending', icon: Clock, badge: 8 },
+      { name: 'Delivered Orders', href: '/dashboard/orders/delivered', icon: CheckCircle, badge: 15 },
     ],
   },
-  {
-    name: 'Banners',
-    href: '/dashboard/banners',
-    icon: Image,
-    badge: 0, // Will be updated dynamically
-  },
+  { name: 'Banners', href: '/dashboard/banners', icon: Image, badge: 0 },
 ];
 
-// Fixed variants with proper TypeScript types
-const sidebarVariants = {
-  hidden: { x: -300, opacity: 0 },
-  visible: {
-    x: 0,
-    opacity: 1,
-  }
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, x: -20 },
-  visible: { opacity: 1, x: 0 }
-};
-
-const subItemVariants = {
-  hidden: { opacity: 0, height: 0 },
-  visible: { opacity: 1, height: "auto" }
-};
+const sidebarVariants = { hidden: { x: -300, opacity: 0 }, visible: { x: 0, opacity: 1 } };
+const itemVariants = { hidden: { opacity: 0, x: -20 }, visible: { opacity: 1, x: 0 } };
+const subItemVariants = { hidden: { opacity: 0, height: 0 }, visible: { opacity: 1, height: 'auto' } };
 
 interface NavItemProps {
   item: MenuItem;
@@ -164,46 +105,20 @@ const NavItem = ({ item, index, isActive, hasSubItems, expandedItems, toggleExpa
 
   if (hasSubItems) {
     return (
-      <motion.div
-        variants={itemVariants}
-        initial="hidden"
-        animate="visible"
-        transition={{ delay: 0.1 + index * 0.1, duration: 0.4, ease: "easeOut" }}
-      >
-        <Button
-          variant={isActive ? "secondary" : "ghost"}
-          className="w-full justify-between group relative overflow-hidden"
-          onClick={() => toggleExpanded(item.name)}
-        >
+      <motion.div variants={itemVariants} initial="hidden" animate="visible" transition={{ delay: 0.1 + index * 0.1, duration: 0.4, ease: 'easeOut' }}>
+        <Button variant={isActive ? 'secondary' : 'ghost'} className="w-full justify-between group relative overflow-hidden" onClick={() => toggleExpanded(item.name)}>
           {isActive && (
-            <motion.div
-              className="absolute inset-0 bg-blue-100 rounded-md"
-              layoutId="activeBackground"
-              transition={{ type: "spring", stiffness: 500, damping: 30 }}
-            />
+            <motion.div className="absolute inset-0 bg-blue-100 rounded-md" layoutId="activeBackground" transition={{ type: 'spring', stiffness: 500, damping: 30 }} />
           )}
-
           <div className="flex items-center space-x-3 z-10 relative">
-            <motion.div
-              initial={{ scale: 0.8 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 0.2 + index * 0.1, duration: 0.3 }}
-            >
+            <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} transition={{ delay: 0.2 + index * 0.1, duration: 0.3 }}>
               <Icon className="h-4 w-4" />
             </motion.div>
             <span className="font-medium">{item.name}</span>
           </div>
-
           <div className="flex items-center space-x-2 z-10 relative">
-            {item.badge && item.badge > 0 && (
-              <Badge variant="default" className="h-5 px-1 text-xs bg-red-500">
-                {item.badge}
-              </Badge>
-            )}
-            <motion.div
-              animate={{ rotate: expandedItems.includes(item.name) ? 180 : 0 }}
-              transition={{ duration: 0.2 }}
-            >
+            {item.badge && item.badge > 0 && <Badge variant="default" className="h-5 px-1 text-xs bg-red-500">{item.badge}</Badge>}
+            <motion.div animate={{ rotate: expandedItems.includes(item.name) ? 180 : 0 }} transition={{ duration: 0.2 }}>
               <ChevronDown className="h-4 w-4" />
             </motion.div>
           </div>
@@ -211,49 +126,22 @@ const NavItem = ({ item, index, isActive, hasSubItems, expandedItems, toggleExpa
 
         <AnimatePresence>
           {expandedItems.includes(item.name) && (
-            <motion.div
-              variants={subItemVariants}
-              initial="hidden"
-              animate="visible"
-              exit="hidden"
-              transition={{ duration: 0.3, ease: "easeOut" }}
-              className="ml-6 mt-1 space-y-1 border-l-2 border-gray-100 pl-3"
-            >
-              {item.subItems?.map((subItem: SubMenuItem, subIndex: number) => {
+            <motion.div variants={subItemVariants} initial="hidden" animate="visible" exit="hidden" transition={{ duration: 0.3, ease: 'easeOut' }} className="ml-6 mt-1 space-y-1 border-l-2 border-gray-100 pl-3">
+              {item.subItems?.map((subItem, subIndex) => {
                 const SubIcon = subItem.icon;
                 const isSubActive = pathname === subItem.href;
-
                 return (
-                  <motion.div
-                    key={subItem.name}
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: subIndex * 0.05, duration: 0.3 }}
-                  >
-                    <Link
-                      href={subItem.href}
-                      onClick={() => mobile && setOpen(false)}
-                    >
-                      <Button
-                        variant={isSubActive ? "secondary" : "ghost"}
-                        className="w-full justify-start text-sm group relative"
-                      >
+                  <motion.div key={subItem.name} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: subIndex * 0.05, duration: 0.3 }}>
+                    <Link href={subItem.href} onClick={() => mobile && setOpen(false)}>
+                      <Button variant={isSubActive ? 'secondary' : 'ghost'} className="w-full justify-start text-sm group relative">
                         {isSubActive && (
-                          <motion.div
-                            className="absolute inset-0 bg-blue-50 rounded-md"
-                            layoutId="activeSubBackground"
-                            transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                          />
+                          <motion.div className="absolute inset-0 bg-blue-50 rounded-md" layoutId="activeSubBackground" transition={{ type: 'spring', stiffness: 500, damping: 30 }} />
                         )}
                         <div className="flex items-center space-x-2 z-10 relative">
                           <SubIcon className="h-3 w-3" />
                           <span>{subItem.name}</span>
                         </div>
-                        {subItem.badge && subItem.badge > 0 && (
-                          <Badge variant="outline" className="h-4 px-1 text-xs ml-auto z-10">
-                            {subItem.badge}
-                          </Badge>
-                        )}
+                        {subItem.badge && subItem.badge > 0 && <Badge variant="outline" className="h-4 px-1 text-xs ml-auto z-10">{subItem.badge}</Badge>}
                       </Button>
                     </Link>
                   </motion.div>
@@ -267,48 +155,17 @@ const NavItem = ({ item, index, isActive, hasSubItems, expandedItems, toggleExpa
   }
 
   return (
-    <motion.div
-      variants={itemVariants}
-      initial="hidden"
-      animate="visible"
-      transition={{ delay: 0.1 + index * 0.1, duration: 0.4, ease: "easeOut" }}
-    >
-      <Link
-        href={item.href}
-        onClick={() => mobile && setOpen(false)}
-      >
-        <Button
-          variant={isActive ? "secondary" : "ghost"}
-          className="w-full justify-start group relative overflow-hidden"
-        >
-          {isActive && (
-            <motion.div
-              className="absolute inset-0 bg-blue-100 rounded-md"
-              layoutId="activeBackground"
-              transition={{ type: "spring", stiffness: 500, damping: 30 }}
-            />
-          )}
-
+    <motion.div variants={itemVariants} initial="hidden" animate="visible" transition={{ delay: 0.1 + index * 0.1, duration: 0.4, ease: 'easeOut' }}>
+      <Link href={item.href} onClick={() => mobile && setOpen(false)}>
+        <Button variant={isActive ? 'secondary' : 'ghost'} className="w-full justify-start group relative overflow-hidden">
+          {isActive && <motion.div className="absolute inset-0 bg-blue-100 rounded-md" layoutId="activeBackground" transition={{ type: 'spring', stiffness: 500, damping: 30 }} />}
           <div className="flex items-center space-x-3 z-10 relative">
-            <motion.div
-              initial={{ scale: 0.8 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 0.2 + index * 0.1, duration: 0.3 }}
-            >
+            <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} transition={{ delay: 0.2 + index * 0.1, duration: 0.3 }}>
               <Icon className="h-4 w-4" />
             </motion.div>
             <span className="font-medium">{item.name}</span>
           </div>
-
-          {item.badge !== null && item.badge > 0 && (
-            <Badge
-              variant="default"
-              className={`h-5 px-1 text-xs ml-auto z-10 ${item.name === 'Banners' ? 'bg-gradient-to-r from-green-500 to-blue-500' : 'bg-red-500'
-                }`}
-            >
-              {item.badge}
-            </Badge>
-          )}
+          {item.badge !== null && item.badge > 0 && <Badge variant="default" className={`h-5 px-1 text-xs ml-auto z-10 ${item.name === 'Banners' ? 'bg-gradient-to-r from-green-500 to-blue-500' : 'bg-red-500'}`}>{item.badge}</Badge>}
         </Button>
       </Link>
     </motion.div>
@@ -322,12 +179,7 @@ const NavContent = ({ mobile = false, setOpen, width = 320, onLogout }: { mobile
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
   const pathname = usePathname();
 
-  // Update menu items with dynamic banner count
-  const updatedMenuItems = menuItems.map(item =>
-    item.name === 'Banners'
-      ? { ...item, badge: bannersCount }
-      : item
-  );
+  const updatedMenuItems = menuItems.map(item => (item.name === 'Banners' ? { ...item, badge: bannersCount } : item));
 
   const fetchBannersCount = async () => {
     try {
@@ -335,8 +187,7 @@ const NavContent = ({ mobile = false, setOpen, width = 320, onLogout }: { mobile
       const response = await axios.get<Banner[]>('http://localhost:8000/banners');
       setBannersCount(response.data.length);
       setLastUpdated(new Date());
-    } catch (error) {
-      console.error('Error fetching banners count:', error);
+    } catch {
       setBannersCount(0);
     } finally {
       setLoading(false);
@@ -345,49 +196,23 @@ const NavContent = ({ mobile = false, setOpen, width = 320, onLogout }: { mobile
 
   useEffect(() => {
     fetchBannersCount();
-
-    // Refresh banners count every 30 seconds
     const interval = setInterval(fetchBannersCount, 30000);
-
     return () => clearInterval(interval);
   }, []);
 
   const toggleExpanded = (itemName: string) => {
-    setExpandedItems(prev =>
-      prev.includes(itemName)
-        ? prev.filter(item => item !== itemName)
-        : [...prev, itemName]
-    );
+    setExpandedItems(prev => (prev.includes(itemName) ? prev.filter(item => item !== itemName) : [...prev, itemName]));
   };
 
   const isActive = (href: string) => pathname === href;
-  const isSubItemActive = (subItems: SubMenuItem[] = []) =>
-    subItems.some((subItem: SubMenuItem) => pathname === subItem.href);
-
-  const formatTime = (date: Date) => {
-    return date.toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit'
-    });
-  };
+  const isSubItemActive = (subItems: SubMenuItem[] = []) => subItems.some(subItem => pathname === subItem.href);
+  const formatTime = (date: Date) => date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
   return (
-    <motion.div
-      className={`flex flex-col h-screen ${mobile ? '' : 'fixed left-0 top-0'}`}
-      variants={sidebarVariants}
-      initial="hidden"
-      animate="visible"
-      transition={{ type: "spring", stiffness: 300, damping: 30, duration: 0.6 }}
-      style={!mobile ? { width: `${width}px` } : {}}
-    >
+    <motion.div className={`flex flex-col h-screen ${mobile ? '' : 'fixed left-0 top-0'}`} variants={sidebarVariants} initial="hidden" animate="visible" transition={{ type: 'spring', stiffness: 300, damping: 30, duration: 0.6 }} style={!mobile ? { width: `${width}px` } : {}}>
       <div className="flex items-center justify-between p-6 border-b bg-gradient-to-r from-blue-600 to-purple-600">
         <div className="flex items-center space-x-3">
-          <motion.div
-            initial={{ rotate: 0 }}
-            animate={{ rotate: 360 }}
-            transition={{ duration: 0.8, ease: "easeInOut" }}
-          >
+          <motion.div initial={{ rotate: 0 }} animate={{ rotate: 360 }} transition={{ duration: 0.8, ease: 'easeInOut' }}>
             <Avatar className="h-10 w-10 bg-white/20 border-2 border-white/30">
               <AvatarFallback className="bg-transparent text-white">
                 <Zap className="h-5 w-5" />
@@ -404,79 +229,43 @@ const NavContent = ({ mobile = false, setOpen, width = 320, onLogout }: { mobile
           </div>
         </div>
         {mobile && (
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setOpen(false)}
-            className="text-white hover:bg-white/20"
-          >
+          <Button variant="ghost" size="icon" onClick={() => setOpen(false)} className="text-white hover:bg-white/20">
             <X className="h-4 w-4" />
           </Button>
         )}
       </div>
 
-      {/* Stats Section */}
       <div className="p-4 border-b bg-gradient-to-r from-gray-50 to-blue-50">
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
             <TrendingUp className="h-4 w-4" />
             Live Stats
           </h3>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={fetchBannersCount}
-            disabled={loading}
-            className="h-6 w-6 text-gray-500 hover:text-blue-600"
-          >
+          <Button variant="ghost" size="icon" onClick={fetchBannersCount} disabled={loading} className="h-6 w-6 text-gray-500 hover:text-blue-600">
             <RefreshCw className={`h-3 w-3 ${loading ? 'animate-spin' : ''}`} />
           </Button>
         </div>
         <div className="space-y-2">
           <div className="flex justify-between items-center text-xs">
             <span className="text-gray-600">Active Banners:</span>
-            <div className="flex items-center gap-2">
-              {loading ? (
-                <div className="h-2 w-8 bg-gray-200 rounded-full animate-pulse" />
-              ) : (
-                <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-                  {bannersCount}
-                </Badge>
-              )}
-            </div>
+            <div className="flex items-center gap-2">{loading ? <div className="h-2 w-8 bg-gray-200 rounded-full animate-pulse" /> : <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">{bannersCount}</Badge>}</div>
           </div>
           <div className="flex justify-between items-center text-xs">
             <span className="text-gray-600">Last Updated:</span>
-            <span className="text-gray-500 text-xs">
-              {formatTime(lastUpdated)}
-            </span>
+            <span className="text-gray-500 text-xs">{formatTime(lastUpdated)}</span>
           </div>
         </div>
       </div>
 
       <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
         {updatedMenuItems.map((item, index) => (
-          <NavItem
-            key={item.name}
-            item={item}
-            index={index}
-            isActive={item.subItems ? isSubItemActive(item.subItems) : isActive(item.href)}
-            hasSubItems={!!item.subItems}
-            expandedItems={expandedItems}
-            toggleExpanded={toggleExpanded}
-            mobile={mobile}
-            setOpen={setOpen}
-          />
+          <NavItem key={item.name} item={item} index={index} isActive={item.subItems ? isSubItemActive(item.subItems) : isActive(item.href)} hasSubItems={!!item.subItems} expandedItems={expandedItems} toggleExpanded={toggleExpanded} mobile={mobile} setOpen={setOpen} />
         ))}
       </nav>
 
       <div className="p-4 border-t">
         <div className="flex items-center space-x-3 p-3 rounded-lg bg-gradient-to-r from-gray-50 to-blue-50 border">
-          <motion.div
-            initial={{ scale: 0.8 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.9, duration: 0.3 }}
-          >
+          <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} transition={{ delay: 0.9, duration: 0.3 }}>
             <Avatar className="h-9 w-9 border-2 border-blue-200">
               <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-500 text-white">
                 <User className="h-4 w-4" />
@@ -487,13 +276,7 @@ const NavContent = ({ mobile = false, setOpen, width = 320, onLogout }: { mobile
             <p className="text-sm font-semibold text-gray-900 truncate">Admin User</p>
             <p className="text-xs text-gray-500 truncate">admin@allmart.com</p>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="text-gray-500 hover:text-red-600 transition-colors"
-            onClick={onLogout}
-            title="Logout"
-          >
+          <Button variant="ghost" size="icon" className="text-gray-500 hover:text-red-600 transition-colors" onClick={onLogout} title="Logout">
             <LogOut className="h-4 w-4" />
           </Button>
         </div>
@@ -520,40 +303,27 @@ const ResizableSidebar = ({ children, width, onWidthChange }: { children: React.
       const newWidth = mouseMoveEvent.clientX;
       const minWidth = 240;
       const maxWidth = 480;
-
-      if (newWidth >= minWidth && newWidth <= maxWidth) {
-        onWidthChange(newWidth);
-      }
+      if (newWidth >= minWidth && newWidth <= maxWidth) onWidthChange(newWidth);
     }
   };
 
   useEffect(() => {
     window.addEventListener('mousemove', resize);
     window.addEventListener('mouseup', stopResizing);
-
     return () => {
       window.removeEventListener('mousemove', resize);
       window.removeEventListener('mouseup', stopResizing);
     };
-  }, [isResizing]);
+  }, [isResizing, resize]);
 
   return (
-    <div
-      ref={sidebarRef}
-      className="relative flex h-screen"
-      style={{ width: `${width}px` }}
-    >
+    <div ref={sidebarRef} className="relative flex h-screen" style={{ width: `${width}px` }}>
       {children}
-      <div
-        className="absolute -right-2 top-0 bottom-0 w-4 cursor-col-resize flex items-center justify-center group z-10"
-        onMouseDown={startResizing}
-      >
+      <div className="absolute -right-2 top-0 bottom-0 w-4 cursor-col-resize flex items-center justify-center group z-10" onMouseDown={startResizing}>
         <div className="w-1 h-16 bg-gray-300 rounded-full group-hover:bg-blue-500 transition-colors duration-200" />
         <GripVertical className="absolute w-3 h-3 text-gray-400 group-hover:text-blue-500 transition-colors duration-200" />
       </div>
-      {isResizing && (
-        <div className="fixed inset-0 z-50 cursor-col-resize" />
-      )}
+      {isResizing && <div className="fixed inset-0 z-50 cursor-col-resize" />}
     </div>
   );
 };
@@ -566,11 +336,7 @@ export default function Sidebar({ onLogout }: SidebarProps) {
     <>
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetTrigger asChild>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="lg:hidden fixed top-4 left-4 z-50 bg-white shadow-lg border"
-          >
+          <Button variant="ghost" size="icon" className="lg:hidden fixed top-4 left-4 z-50 bg-white shadow-lg border">
             <Menu className="h-5 w-5" />
           </Button>
         </SheetTrigger>

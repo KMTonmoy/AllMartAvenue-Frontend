@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Swal from 'sweetalert2';
 import { ChevronLeft, ChevronRight, Play, Pause, Plus, Edit, Trash2, Upload, X } from 'lucide-react';
+import Image from "next/image";
 
 interface Banner {
   _id?: string;
@@ -364,11 +365,14 @@ const BannerManager: React.FC = () => {
 
                 {formData.image ? (
                   <div className="relative">
-                    <img
+                    <Image
                       src={formData.image}
                       alt="Preview"
+                      width={800}
+                      height={400}
                       className="w-full h-48 object-cover rounded-md border"
                     />
+
                     <button
                       onClick={removeImage}
                       className="absolute top-2 right-2 bg-red-600 text-white p-1 rounded-full hover:bg-red-700 transition-colors"

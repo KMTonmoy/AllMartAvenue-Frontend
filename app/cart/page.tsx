@@ -1,12 +1,13 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Minus, Plus, Trash2, MapPin, Phone, Home, Download } from 'lucide-react';
+import { Minus, Plus, Trash2, MapPin, Phone, Home } from 'lucide-react';
 import Swal from 'sweetalert2';
 import toast, { Toaster } from 'react-hot-toast';
 import axios from 'axios';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import Image from 'next/image';
 
 interface CartItem {
   product: {
@@ -306,7 +307,7 @@ const CartPage = () => {
               <p className="text-gray-600 mb-6">Thank you for shopping with us. Your order is being processed.</p>
 
               <div className="flex gap-4 justify-center mb-8">
-         
+
 
                 <button
                   onClick={() => window.location.href = '/products'}
@@ -419,11 +420,14 @@ const CartPage = () => {
                 {cartItems.map((item) => (
                   <div key={`${item.product._id}-${item.selectedColor}`} className="flex items-center gap-4 pb-4 border-b border-gray-200 last:border-b-0">
                     <div className="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-                      <img
+                      <Image
                         src={item.product.images[0]}
                         alt={item.product.name}
-                        className="w-full h-full object-cover"
+                        width={80}
+                        height={80}
+                        className="w-20 h-20 rounded-lg object-cover"
                       />
+
                     </div>
 
                     <div className="flex-grow">
