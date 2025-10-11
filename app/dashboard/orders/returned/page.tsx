@@ -32,14 +32,16 @@ import {
 } from '@/components/ui/alert-dialog';
 import {
   Search,
-
+  Plus,
+  Edit,
   Trash2,
   Package,
-
+  Filter,
   RefreshCw,
   ArrowUpDown,
   Tag,
-   Info,
+
+  Info,
 
   ShoppingCart,
   User,
@@ -109,11 +111,11 @@ interface Order {
 // Extended type for sorting that includes nested properties
 type SortableField = keyof Order | 'customerName' | 'customerPhone';
 
-const PendingOrders = () => {
+const ReturnedOrders = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState('pending'); // Default to pending
+  const [selectedStatus, setSelectedStatus] = useState('returned'); // Default to pending
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [orderToDelete, setOrderToDelete] = useState<Order | null>(null);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
@@ -1145,4 +1147,4 @@ const PendingOrders = () => {
   );
 };
 
-export default PendingOrders;
+export default ReturnedOrders;

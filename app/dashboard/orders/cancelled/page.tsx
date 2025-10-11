@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -32,14 +32,12 @@ import {
 } from '@/components/ui/alert-dialog';
 import {
   Search,
-
   Trash2,
   Package,
-
   RefreshCw,
   ArrowUpDown,
   Tag,
-   Info,
+  Info,
 
   ShoppingCart,
   User,
@@ -53,8 +51,7 @@ import {
   RotateCcw,
   Download,
   Printer,
-  Mail,
-  MessageCircle,
+   MessageCircle,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Swal from 'sweetalert2';
@@ -109,11 +106,11 @@ interface Order {
 // Extended type for sorting that includes nested properties
 type SortableField = keyof Order | 'customerName' | 'customerPhone';
 
-const PendingOrders = () => {
+const CancelledOrders = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState('pending'); // Default to pending
+  const [selectedStatus, setSelectedStatus] = useState('cancelled'); // Default to pending
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [orderToDelete, setOrderToDelete] = useState<Order | null>(null);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
@@ -126,17 +123,7 @@ const PendingOrders = () => {
   const [bulkAction, setBulkAction] = useState('');
   const [selectedOrders, setSelectedOrders] = useState<string[]>([]);
 
-  const statusOptions = [
-    { value: 'pending', label: 'Pending', color: 'yellow' },
-    { value: 'confirmed', label: 'Confirmed', color: 'blue' },
-    { value: 'shipped', label: 'Shipped', color: 'purple' },
-    { value: 'delivered', label: 'Delivered', color: 'green' },
-    { value: 'cancelled', label: 'Cancelled', color: 'red' },
-    { value: 'returned', label: 'Returned', color: 'orange' },
-  ];
 
-  const paymentMethods = ['Cash on Delivery', 'Credit Card', 'bKash', 'Nagad', 'Bank Transfer'];
-  const bulkActions = ['', 'mark_confirmed', 'mark_shipped', 'mark_delivered', 'mark_cancelled', 'delete'];
 
   useEffect(() => {
     fetchOrders();
@@ -174,9 +161,7 @@ const PendingOrders = () => {
         body: JSON.stringify(updateData),
       });
 
-      if (!response.ok) throw new Error('Failed to update order status');
-
-      const result = await response.json();
+ 
 
       // Update local state and remove from list if status is no longer pending
       setOrders(prev => prev.map(order =>
@@ -1145,4 +1130,4 @@ const PendingOrders = () => {
   );
 };
 
-export default PendingOrders;
+export default CancelledOrders;

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Truck, Shield, RotateCcw } from 'lucide-react';
+import {  Shield, RotateCcw } from 'lucide-react';
 import { ServiceFeature } from '@/types/product';
 
 const serviceFeatures: ServiceFeature[] = [

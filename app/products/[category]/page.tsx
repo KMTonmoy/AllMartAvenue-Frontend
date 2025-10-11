@@ -30,7 +30,7 @@ const CategoryPage = () => {
       const searchQuery = categoryName.replace(/-/g, ' ');
 
       // Using axios instead of fetch for better error handling
-      const response = await axios.get(`https://all-mart-avenue-backend.vercel.app/products/search?q=${encodeURIComponent(searchQuery)}`);
+      const response = await axios.get(`http://localhost:8000/products/search?q=${encodeURIComponent(searchQuery)}`);
 
       const data: Product[] = response.data;
       setProducts(data);

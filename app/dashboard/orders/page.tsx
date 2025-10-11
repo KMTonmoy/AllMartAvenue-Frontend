@@ -35,11 +35,11 @@ import {
 
   Trash2,
   Package,
-
   RefreshCw,
   ArrowUpDown,
   Tag,
-   Info,
+
+  Info,
 
   ShoppingCart,
   User,
@@ -53,7 +53,6 @@ import {
   RotateCcw,
   Download,
   Printer,
-  Mail,
   MessageCircle,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -109,11 +108,11 @@ interface Order {
 // Extended type for sorting that includes nested properties
 type SortableField = keyof Order | 'customerName' | 'customerPhone';
 
-const PendingOrders = () => {
+const AllOrdersPage = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState('pending'); // Default to pending
+  const [selectedStatus, setSelectedStatus] = useState('all');
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [orderToDelete, setOrderToDelete] = useState<Order | null>(null);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
@@ -127,6 +126,7 @@ const PendingOrders = () => {
   const [selectedOrders, setSelectedOrders] = useState<string[]>([]);
 
   const statusOptions = [
+    { value: 'all', label: 'All Status', color: 'gray' },
     { value: 'pending', label: 'Pending', color: 'yellow' },
     { value: 'confirmed', label: 'Confirmed', color: 'blue' },
     { value: 'shipped', label: 'Shipped', color: 'purple' },
@@ -178,7 +178,7 @@ const PendingOrders = () => {
 
       const result = await response.json();
 
-      // Update local state and remove from list if status is no longer pending
+      // Update local state
       setOrders(prev => prev.map(order =>
         order._id === orderId ? { ...order, status: newStatus, trackingNumber: trackingNum } : order
       ));
@@ -391,7 +391,7 @@ const PendingOrders = () => {
       'Order Number': order.orderNumber,
       'Customer Name': order.customerInfo.name,
       'Customer Phone': order.customerInfo.phone,
-      'Total Amount': `৳${order.grandTotal}`,
+      'Total Amount': `$${order.grandTotal}`,
       'Payment Method': order.paymentMethod,
       'Status': order.status,
       'Order Date': formatDateTime(order.orderDate),
@@ -441,7 +441,6 @@ const PendingOrders = () => {
               table { width: 100%; border-collapse: collapse; }
               th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
               .total { font-weight: bold; font-size: 1.2em; }
-              .taka { font-family: Arial; }
             </style>
           </head>
           <body>
@@ -473,8 +472,8 @@ const PendingOrders = () => {
                     <tr>
                       <td>${item.product.name}</td>
                       <td>${item.quantity}</td>
-                      <td class="taka">৳${item.product.price}</td>
-                      <td class="taka">৳${(parseFloat(item.product.price) * item.quantity).toFixed(2)}</td>
+                      <td>$${item.product.price}</td>
+                      <td>$${(parseFloat(item.product.price) * item.quantity).toFixed(2)}</td>
                     </tr>
                   `).join('')}
                 </tbody>
@@ -483,9 +482,9 @@ const PendingOrders = () => {
 
             <div class="section">
               <div class="section-title">Order Summary</div>
-              <p><strong>Subtotal:</strong> <span class="taka">৳${order.subtotal}</span></p>
-              <p><strong>Delivery Charge:</strong> <span class="taka">৳${order.deliveryCharge}</span></p>
-              <p class="total"><strong>Grand Total:</strong> <span class="taka">৳${order.grandTotal}</span></p>
+              <p><strong>Subtotal:</strong> $${order.subtotal}</p>
+              <p><strong>Delivery Charge:</strong> $${order.deliveryCharge}</p>
+              <p class="total"><strong>Grand Total:</strong> $${order.grandTotal}</p>
               <p><strong>Payment Method:</strong> ${order.paymentMethod}</p>
               <p><strong>Status:</strong> ${order.status}</p>
               ${order.trackingNumber ? `<p><strong>Tracking Number:</strong> ${order.trackingNumber}</p>` : ''}
@@ -521,7 +520,6 @@ const PendingOrders = () => {
     }
   };
 
-  // Filter to show only pending orders by default
   const filteredAndSortedOrders = orders
     .filter(order => {
       const matchesSearch =
@@ -573,8 +571,8 @@ const PendingOrders = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Pending Orders Management</h1>
-          <p className="text-muted-foreground">Manage and process pending customer orders</p>
+          <h1 className="text-3xl font-bold tracking-tight">Order Management</h1>
+          <p className="text-muted-foreground">Manage all customer orders and track order status</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={exportOrders}>
@@ -588,8 +586,8 @@ const PendingOrders = () => {
         </div>
       </div>
 
-      {/* Stats Cards - Only show pending stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+      {/* Stats Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
@@ -599,14 +597,13 @@ const PendingOrders = () => {
             <div className="text-2xl font-bold">{stats.total}</div>
           </CardContent>
         </Card>
-        <Card className="bg-yellow-50 border-yellow-200">
+        <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Pending</CardTitle>
-            <Clock className="h-4 w-4 text-yellow-600" />
+            <Clock className="h-4 w-4 text-yellow-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-yellow-700">{stats.pending}</div>
-            <p className="text-xs text-yellow-600 mt-1">Awaiting processing</p>
+            <div className="text-2xl font-bold text-yellow-600">{stats.pending}</div>
           </CardContent>
         </Card>
         <Card>
@@ -638,11 +635,29 @@ const PendingOrders = () => {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Cancelled</CardTitle>
+            <XCircle className="h-4 w-4 text-red-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-red-600">{stats.cancelled}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Returned</CardTitle>
+            <RotateCcw className="h-4 w-4 text-orange-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-orange-600">{stats.returned}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Revenue</CardTitle>
             <Tag className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">৳{stats.revenue}</div>
+            <div className="text-2xl font-bold text-green-600">${stats.revenue}</div>
           </CardContent>
         </Card>
       </div>
@@ -692,7 +707,7 @@ const PendingOrders = () => {
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search pending orders by customer name, phone, or order number..."
+                placeholder="Search orders by customer name, phone, or order number..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -703,12 +718,11 @@ const PendingOrders = () => {
               onChange={(e) => setSelectedStatus(e.target.value)}
               className="px-3 py-2 border rounded-md bg-background"
             >
-              <option value="pending">Pending Orders</option>
-              <option value="confirmed">Confirmed</option>
-              <option value="shipped">Shipped</option>
-              <option value="delivered">Delivered</option>
-              <option value="cancelled">Cancelled</option>
-              <option value="returned">Returned</option>
+              {statusOptions.map(status => (
+                <option key={status.value} value={status.value}>
+                  {status.label}
+                </option>
+              ))}
             </select>
           </div>
         </CardContent>
@@ -717,14 +731,7 @@ const PendingOrders = () => {
       {/* Orders Table */}
       <Card>
         <CardHeader>
-          <CardTitle>
-            {selectedStatus === 'pending' ? 'Pending Orders' :
-              selectedStatus === 'confirmed' ? 'Confirmed Orders' :
-                selectedStatus === 'shipped' ? 'Shipped Orders' :
-                  selectedStatus === 'delivered' ? 'Delivered Orders' :
-                    selectedStatus === 'cancelled' ? 'Cancelled Orders' : 'Returned Orders'}
-            ({filteredAndSortedOrders.length})
-          </CardTitle>
+          <CardTitle>All Orders ({filteredAndSortedOrders.length})</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="rounded-md border">
@@ -805,9 +812,9 @@ const PendingOrders = () => {
                     </TableCell>
                     <TableCell>
                       <div className="flex flex-col">
-                        <span className="font-semibold">৳{order.grandTotal}</span>
+                        <span className="font-semibold">${order.grandTotal}</span>
                         <span className="text-xs text-muted-foreground">
-                          Items: ৳{order.subtotal} + Delivery: ৳{order.deliveryCharge}
+                          Items: ${order.subtotal} + Delivery: ${order.deliveryCharge}
                         </span>
                       </div>
                     </TableCell>
@@ -890,15 +897,11 @@ const PendingOrders = () => {
             {filteredAndSortedOrders.length === 0 && (
               <div className="text-center py-8">
                 <ShoppingCart className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-semibold">
-                  {selectedStatus === 'pending' ? 'No pending orders found' : 'No orders found'}
-                </h3>
+                <h3 className="text-lg font-semibold">No orders found</h3>
                 <p className="text-muted-foreground">
-                  {searchTerm
-                    ? 'Try adjusting your search criteria'
-                    : selectedStatus === 'pending'
-                      ? 'All pending orders have been processed'
-                      : `No ${selectedStatus} orders found`
+                  {searchTerm || selectedStatus !== 'all'
+                    ? 'Try adjusting your search or filter criteria'
+                    : 'No orders have been placed yet'
                   }
                 </p>
               </div>
@@ -969,15 +972,15 @@ const PendingOrders = () => {
                     <CardContent className="space-y-3">
                       <div className="flex justify-between">
                         <span className="text-sm">Subtotal:</span>
-                        <span className="text-sm font-medium">৳{selectedOrder.subtotal}</span>
+                        <span className="text-sm font-medium">${selectedOrder.subtotal}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-sm">Delivery Charge:</span>
-                        <span className="text-sm font-medium">৳{selectedOrder.deliveryCharge}</span>
+                        <span className="text-sm font-medium">${selectedOrder.deliveryCharge}</span>
                       </div>
                       <div className="flex justify-between border-t pt-2">
                         <span className="text-sm font-semibold">Grand Total:</span>
-                        <span className="text-sm font-bold">৳{selectedOrder.grandTotal}</span>
+                        <span className="text-sm font-bold">${selectedOrder.grandTotal}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-sm">Payment Method:</span>
@@ -1029,7 +1032,7 @@ const PendingOrders = () => {
                             <div className="flex-1">
                               <h4 className="font-medium text-sm">{item.product.name}</h4>
                               <p className="text-xs text-muted-foreground">
-                                Quantity: {item.quantity} × ৳{item.product.price}
+                                Quantity: {item.quantity} × ${item.product.price}
                               </p>
                               <div className="flex items-center gap-2 mt-1">
                                 <div
@@ -1042,7 +1045,7 @@ const PendingOrders = () => {
                                 </span>
                               </div>
                               <p className="text-sm font-semibold mt-1">
-                                ৳{(parseFloat(item.product.price) * item.quantity).toFixed(2)}
+                                ${(parseFloat(item.product.price) * item.quantity).toFixed(2)}
                               </p>
                             </div>
                           </div>
@@ -1145,4 +1148,4 @@ const PendingOrders = () => {
   );
 };
 
-export default PendingOrders;
+export default AllOrdersPage;

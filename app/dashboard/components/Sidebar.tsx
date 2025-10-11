@@ -18,7 +18,6 @@ import {
   User,
   LogOut,
   ChevronDown,
-  Plus,
   AlertTriangle,
   CheckCircle,
   TrendingUp,
@@ -26,6 +25,9 @@ import {
   Sparkles,
   Clock,
   GripVertical,
+  Truck,
+  RotateCcw,
+  Ban,
   RefreshCw,
 } from 'lucide-react';
 
@@ -36,6 +38,29 @@ interface Banner {
   description: string;
   buttonText: string;
   image: string;
+}
+
+interface Product {
+  _id: string;
+  name: string;
+  description: string;
+  details: string;
+  price: string;
+  originalPrice: string;
+  discount: number;
+  category: string;
+  productTag: string;
+  stock: number;
+  colors: Array<{ value: string; name: string }>;
+  images: string[];
+  videoURL: string;
+  features: string[];
+}
+
+interface Order {
+  _id: string;
+  status: 'pending' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled' | 'returned';
+  orderNumber: string;
 }
 
 interface SubMenuItem {
@@ -59,22 +84,25 @@ const menuItems: MenuItem[] = [
     name: 'Products',
     href: '/dashboard/products',
     icon: Package,
-    badge: 12,
+    badge: null,
     subItems: [
-      { name: 'All Products', href: '/dashboard/products', icon: Package, badge: 45 },
-      { name: 'Add Product', href: '/dashboard/products/add', icon: Plus, badge: null },
-      { name: 'Out of Stock', href: '/dashboard/products/out-of-stock', icon: AlertTriangle, badge: 3 },
+      { name: 'All Products', href: '/dashboard/products', icon: Package, badge: null },
+      { name: 'Out of Stock', href: '/dashboard/products/out-of-stock', icon: AlertTriangle, badge: null },
     ],
   },
   {
     name: 'Orders',
     href: '/dashboard/orders',
     icon: ShoppingCart,
-    badge: 8,
+    badge: 0,
     subItems: [
-      { name: 'All Orders', href: '/dashboard/orders', icon: ShoppingCart, badge: 23 },
-      { name: 'Pending Orders', href: '/dashboard/orders/pending', icon: Clock, badge: 8 },
-      { name: 'Delivered Orders', href: '/dashboard/orders/delivered', icon: CheckCircle, badge: 15 },
+      { name: 'All Orders', href: '/dashboard/orders', icon: ShoppingCart, badge: 0 },
+      { name: 'Pending Orders', href: '/dashboard/orders/pending', icon: Clock, badge: 0 },
+      { name: 'Confirmed Orders', href: '/dashboard/orders/confirmed', icon: CheckCircle, badge: 0 },
+      { name: 'Shipped Orders', href: '/dashboard/orders/shipped', icon: Truck, badge: 0 },
+      { name: 'Delivered Orders', href: '/dashboard/orders/delivered', icon: CheckCircle, badge: 0 },
+      { name: 'Cancelled Orders', href: '/dashboard/orders/cancelled', icon: Ban, badge: 0 },
+      { name: 'Returned Orders', href: '/dashboard/orders/returned', icon: RotateCcw, badge: 0 },
     ],
   },
   { name: 'Banners', href: '/dashboard/banners', icon: Image, badge: 0 },
@@ -175,30 +203,133 @@ const NavItem = ({ item, index, isActive, hasSubItems, expandedItems, toggleExpa
 const NavContent = ({ mobile = false, setOpen, width = 320, onLogout }: { mobile?: boolean; setOpen: (open: boolean) => void; width?: number; onLogout?: () => void }) => {
   const [expandedItems, setExpandedItems] = useState<string[]>(['Products']);
   const [bannersCount, setBannersCount] = useState<number>(0);
+  const [productsCount, setProductsCount] = useState<number>(0);
+  const [outOfStockCount, setOutOfStockCount] = useState<number>(0);
+  const [ordersCount, setOrdersCount] = useState<{
+    all: number;
+    pending: number;
+    confirmed: number;
+    shipped: number;
+    delivered: number;
+    cancelled: number;
+    returned: number;
+  }>({
+    all: 0,
+    pending: 0,
+    confirmed: 0,
+    shipped: 0,
+    delivered: 0,
+    cancelled: 0,
+    returned: 0
+  });
   const [loading, setLoading] = useState<boolean>(true);
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
   const pathname = usePathname();
 
-  const updatedMenuItems = menuItems.map(item => (item.name === 'Banners' ? { ...item, badge: bannersCount } : item));
-
   const fetchBannersCount = async () => {
     try {
-      setLoading(true);
       const response = await axios.get<Banner[]>('http://localhost:8000/banners');
       setBannersCount(response.data.length);
-      setLastUpdated(new Date());
     } catch {
       setBannersCount(0);
+    }
+  };
+
+  const fetchProductsCount = async () => {
+    try {
+      const response = await axios.get<Product[]>('http://localhost:8000/products');
+      const products = response.data;
+      setProductsCount(products.length);
+      const outOfStockProducts = products.filter(product => product.stock === 0);
+      setOutOfStockCount(outOfStockProducts.length);
+    } catch {
+      setProductsCount(0);
+      setOutOfStockCount(0);
+    }
+  };
+
+  const fetchOrdersCount = async () => {
+    try {
+      const response = await axios.get<Order[]>('http://localhost:8000/orders');
+      const orders = response.data;
+
+      setOrdersCount({
+        all: orders.length,
+        pending: orders.filter(order => order.status === 'pending').length,
+        confirmed: orders.filter(order => order.status === 'confirmed').length,
+        shipped: orders.filter(order => order.status === 'shipped').length,
+        delivered: orders.filter(order => order.status === 'delivered').length,
+        cancelled: orders.filter(order => order.status === 'cancelled').length,
+        returned: orders.filter(order => order.status === 'returned').length
+      });
+    } catch {
+      setOrdersCount({
+        all: 0,
+        pending: 0,
+        confirmed: 0,
+        shipped: 0,
+        delivered: 0,
+        cancelled: 0,
+        returned: 0
+      });
+    }
+  };
+
+  const fetchAllData = async () => {
+    try {
+      setLoading(true);
+      await Promise.all([fetchBannersCount(), fetchProductsCount(), fetchOrdersCount()]);
+      setLastUpdated(new Date());
+    } catch (error) {
+      console.error('Error fetching data:', error);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchBannersCount();
-    const interval = setInterval(fetchBannersCount, 30000);
+    fetchAllData();
+    const interval = setInterval(fetchAllData, 30000);
     return () => clearInterval(interval);
   }, []);
+
+  const updatedMenuItems = menuItems.map(item => {
+    if (item.name === 'Products') {
+      return {
+        ...item,
+        badge: productsCount,
+        subItems: item.subItems?.map(subItem => {
+          if (subItem.name === 'All Products') {
+            return { ...subItem, badge: productsCount };
+          }
+          if (subItem.name === 'Out of Stock') {
+            return { ...subItem, badge: outOfStockCount };
+          }
+          return subItem;
+        })
+      };
+    }
+    if (item.name === 'Orders') {
+      return {
+        ...item,
+        badge: ordersCount.pending,
+        subItems: item.subItems?.map(subItem => {
+          if (subItem.name === 'All Orders') return { ...subItem, badge: ordersCount.all };
+          if (subItem.name === 'Pending Orders') return { ...subItem, badge: ordersCount.pending };
+          if (subItem.name === 'Confirmed Orders') return { ...subItem, badge: ordersCount.confirmed };
+          if (subItem.name === 'Shipped Orders') return { ...subItem, badge: ordersCount.shipped };
+          if (subItem.name === 'Delivered Orders') return { ...subItem, badge: ordersCount.delivered };
+          if (subItem.name === 'Cancelled Orders') return { ...subItem, badge: ordersCount.cancelled };
+          if (subItem.name === 'Returned Orders') return { ...subItem, badge: ordersCount.returned };
+          return subItem;
+        })
+      };
+    }
+    if (item.name === 'Banners') {
+      return { ...item, badge: bannersCount };
+    }
+    return item;
+  });
 
   const toggleExpanded = (itemName: string) => {
     setExpandedItems(prev => (prev.includes(itemName) ? prev.filter(item => item !== itemName) : [...prev, itemName]));
@@ -241,14 +372,58 @@ const NavContent = ({ mobile = false, setOpen, width = 320, onLogout }: { mobile
             <TrendingUp className="h-4 w-4" />
             Live Stats
           </h3>
-          <Button variant="ghost" size="icon" onClick={fetchBannersCount} disabled={loading} className="h-6 w-6 text-gray-500 hover:text-blue-600">
+          <Button variant="ghost" size="icon" onClick={fetchAllData} disabled={loading} className="h-6 w-6 text-gray-500 hover:text-blue-600">
             <RefreshCw className={`h-3 w-3 ${loading ? 'animate-spin' : ''}`} />
           </Button>
         </div>
         <div className="space-y-2">
           <div className="flex justify-between items-center text-xs">
+            <span className="text-gray-600">Total Products:</span>
+            <div className="flex items-center gap-2">
+              {loading ? (
+                <div className="h-2 w-8 bg-gray-200 rounded-full animate-pulse" />
+              ) : (
+                <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                  {productsCount}
+                </Badge>
+              )}
+            </div>
+          </div>
+          <div className="flex justify-between items-center text-xs">
+            <span className="text-gray-600">Out of Stock:</span>
+            <div className="flex items-center gap-2">
+              {loading ? (
+                <div className="h-2 w-8 bg-gray-200 rounded-full animate-pulse" />
+              ) : (
+                <Badge variant="outline" className={`${outOfStockCount > 0 ? 'bg-red-50 text-red-700 border-red-200' : 'bg-green-50 text-green-700 border-green-200'}`}>
+                  {outOfStockCount}
+                </Badge>
+              )}
+            </div>
+          </div>
+          <div className="flex justify-between items-center text-xs">
             <span className="text-gray-600">Active Banners:</span>
-            <div className="flex items-center gap-2">{loading ? <div className="h-2 w-8 bg-gray-200 rounded-full animate-pulse" /> : <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">{bannersCount}</Badge>}</div>
+            <div className="flex items-center gap-2">
+              {loading ? (
+                <div className="h-2 w-8 bg-gray-200 rounded-full animate-pulse" />
+              ) : (
+                <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                  {bannersCount}
+                </Badge>
+              )}
+            </div>
+          </div>
+          <div className="flex justify-between items-center text-xs">
+            <span className="text-gray-600">Pending Orders:</span>
+            <div className="flex items-center gap-2">
+              {loading ? (
+                <div className="h-2 w-8 bg-gray-200 rounded-full animate-pulse" />
+              ) : (
+                <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">
+                  {ordersCount.pending}
+                </Badge>
+              )}
+            </div>
           </div>
           <div className="flex justify-between items-center text-xs">
             <span className="text-gray-600">Last Updated:</span>
@@ -259,7 +434,17 @@ const NavContent = ({ mobile = false, setOpen, width = 320, onLogout }: { mobile
 
       <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
         {updatedMenuItems.map((item, index) => (
-          <NavItem key={item.name} item={item} index={index} isActive={item.subItems ? isSubItemActive(item.subItems) : isActive(item.href)} hasSubItems={!!item.subItems} expandedItems={expandedItems} toggleExpanded={toggleExpanded} mobile={mobile} setOpen={setOpen} />
+          <NavItem
+            key={item.name}
+            item={item}
+            index={index}
+            isActive={item.subItems ? isSubItemActive(item.subItems) : isActive(item.href)}
+            hasSubItems={!!item.subItems}
+            expandedItems={expandedItems}
+            toggleExpanded={toggleExpanded}
+            mobile={mobile}
+            setOpen={setOpen}
+          />
         ))}
       </nav>
 

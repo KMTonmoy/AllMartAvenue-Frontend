@@ -202,7 +202,7 @@ const CartPage = () => {
     };
 
     try {
-      const response = await axios.post('https://all-mart-avenue-backend.vercel.app/orders', orderData);
+      const response = await axios.post('http://localhost:8000/orders', orderData);
 
       if (response.status === 201) {
         setOrderData(orderData);
@@ -659,7 +659,7 @@ const CartPage = () => {
                 disabled={isSubmitting}
                 className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isSubmitting ? 'Placing Order...' : 'Proceed to Checkout'}
+                {isSubmitting ? 'Placing Order...' : 'Confirm Order'}
               </button>
 
               <p className="text-xs text-gray-500 text-center mt-4">

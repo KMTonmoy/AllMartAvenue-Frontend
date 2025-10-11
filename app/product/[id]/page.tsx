@@ -45,7 +45,7 @@ const ProductDetails: React.FC = () => {
 
       try {
         setLoading(true);
-        const response = await axios.get(`https://all-mart-avenue-backend.vercel.app/products/${productId}`);
+        const response = await axios.get(`http://localhost:8000/products/${productId}`);
         const productData = response.data;
         setCurrentProduct(productData);
 

@@ -35,7 +35,7 @@ import {
 
   Trash2,
   Package,
-
+  Filter,
   RefreshCw,
   ArrowUpDown,
   Tag,
@@ -53,8 +53,7 @@ import {
   RotateCcw,
   Download,
   Printer,
-  Mail,
-  MessageCircle,
+   MessageCircle,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Swal from 'sweetalert2';
@@ -109,11 +108,11 @@ interface Order {
 // Extended type for sorting that includes nested properties
 type SortableField = keyof Order | 'customerName' | 'customerPhone';
 
-const PendingOrders = () => {
+const ConfirmedOrders = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState('pending'); // Default to pending
+  const [selectedStatus, setSelectedStatus] = useState('confirmed'); // Default to pending
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [orderToDelete, setOrderToDelete] = useState<Order | null>(null);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
@@ -1145,4 +1144,4 @@ const PendingOrders = () => {
   );
 };
 
-export default PendingOrders;
+export default ConfirmedOrders;

@@ -2,13 +2,11 @@
 
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { useRouter } from "next/navigation";
 import axios from "axios";
 import { Product } from "@/types/product";
 import ProductCard from "./ProductCard/ProductCard";
 
 const Products = () => {
-  const router = useRouter();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -17,7 +15,7 @@ const Products = () => {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        const response = await axios.get<Product[]>("https://all-mart-avenue-backend.vercel.app/products");
+        const response = await axios.get<Product[]>("http://localhost:8000/products");
         setProducts(response.data);
         setError(null);
       } catch (err) {

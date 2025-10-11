@@ -27,7 +27,7 @@ const FlashSale = () => {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        const response = await axios.get<Product[]>("https://all-mart-avenue-backend.vercel.app/products");
+        const response = await axios.get<Product[]>("http://localhost:8000/products");
         const flashProducts = response.data.filter((p: Product) =>
           p.productTag?.toLowerCase().includes("flash")
         );

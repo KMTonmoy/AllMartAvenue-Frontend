@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
- import { Product } from "@/types/product";
+import { Product } from "@/types/product";
 import ProductCard from "@/components/ProductCard/ProductCard";
 
 const Fashion = () => {
@@ -11,7 +11,7 @@ const Fashion = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await fetch("https://all-mart-avenue-backend.vercel.app/products");
+        const res = await fetch("http://localhost:8000/products");
         const data: Product[] = await res.json();
 
         // ✅ Filter only fashion products
@@ -66,7 +66,7 @@ const Fashion = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {products.map((product, index) => (
             <ProductCard
-              key={product._id }
+              key={product._id}
               product={product}
               index={index}
               onAddToCart={handleAddToCart}
