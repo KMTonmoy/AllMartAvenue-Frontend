@@ -12,7 +12,7 @@ interface ProductCardProps {
   onAddToCart?: (product: Product) => void;
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0, onAddToCart }) => {
+const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0 }) => {
   const router = useRouter();
 
   const handleProductClick = () => {
@@ -99,8 +99,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0, onAddToCa
             </div>
           </div>
         )}
-
-
       </div>
     </motion.div>
   );

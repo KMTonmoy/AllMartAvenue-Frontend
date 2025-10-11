@@ -9,17 +9,16 @@ import {
   TrendingUp,
   DollarSign,
   RefreshCw,
-
   CheckCircle,
   XCircle,
   RotateCcw,
   Truck,
   Clock,
   BarChart3,
-
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
+import Image from 'next/image';
 
 interface Product {
   _id: string;
@@ -86,8 +85,8 @@ const Dashboard = () => {
     try {
       setLoading(true);
       const [productsResponse, ordersResponse] = await Promise.all([
-        fetch('http://localhost:8000/products'),
-        fetch('http://localhost:8000/orders')
+        fetch('https://all-mart-avenue-backend.vercel.app/products'),
+        fetch('https://all-mart-avenue-backend.vercel.app/orders')
       ]);
 
       if (!productsResponse.ok || !ordersResponse.ok) {
@@ -385,9 +384,11 @@ const Dashboard = () => {
               {currentProducts.map((product) => (
                 <div key={product._id} className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <img
+                    <Image
                       src={product.images[0]}
                       alt={product.name}
+                      width={40}
+                      height={40}
                       className="w-10 h-10 rounded-md object-cover"
                     />
                     <div className="flex-1 min-w-0">
@@ -498,9 +499,11 @@ const Dashboard = () => {
                 .map((product) => (
                   <div key={product._id} className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <img
+                      <Image
                         src={product.images[0]}
                         alt={product.name}
+                        width={40}
+                        height={40}
                         className="w-10 h-10 rounded-md object-cover"
                       />
                       <div className="flex-1 min-w-0">

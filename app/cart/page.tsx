@@ -202,7 +202,7 @@ const CartPage = () => {
     };
 
     try {
-      const response = await axios.post('http://localhost:8000/orders', orderData);
+      const response = await axios.post('https://all-mart-avenue-backend.vercel.app/orders', orderData);
 
       if (response.status === 201) {
         setOrderData(orderData);

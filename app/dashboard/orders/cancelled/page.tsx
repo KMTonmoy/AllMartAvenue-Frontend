@@ -36,9 +36,7 @@ import {
   Package,
   RefreshCw,
   ArrowUpDown,
-  Tag,
   Info,
-
   ShoppingCart,
   User,
   Phone,
@@ -51,7 +49,7 @@ import {
   RotateCcw,
   Download,
   Printer,
-   MessageCircle,
+  MessageCircle,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Swal from 'sweetalert2';
@@ -106,11 +104,16 @@ interface Order {
 // Extended type for sorting that includes nested properties
 type SortableField = keyof Order | 'customerName' | 'customerPhone';
 
+interface StatusUpdateData {
+  status: Order['status'];
+  trackingNumber?: string;
+}
+
 const CancelledOrders = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState('cancelled'); // Default to pending
+  const [selectedStatus, setSelectedStatus] = useState('cancelled');
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [orderToDelete, setOrderToDelete] = useState<Order | null>(null);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
@@ -123,8 +126,6 @@ const CancelledOrders = () => {
   const [bulkAction, setBulkAction] = useState('');
   const [selectedOrders, setSelectedOrders] = useState<string[]>([]);
 
-
-
   useEffect(() => {
     fetchOrders();
   }, []);
@@ -133,7 +134,7 @@ const CancelledOrders = () => {
     const loadingToast = toast.loading('Loading orders...');
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:8000/orders');
+      const response = await fetch('https://all-mart-avenue-backend.vercel.app/orders');
       if (!response.ok) throw new Error('Failed to fetch orders');
       const data = await response.json();
       setOrders(data);
@@ -150,18 +151,16 @@ const CancelledOrders = () => {
     const updateToast = toast.loading(`Updating order to ${newStatus}...`);
 
     try {
-      const updateData: any = { status: newStatus };
+      const updateData: StatusUpdateData = { status: newStatus };
       if (newStatus === 'shipped' && trackingNum) {
         updateData.trackingNumber = trackingNum;
       }
 
-      const response = await fetch(`http://localhost:8000/orders/${orderId}`, {
+      await fetch(`https://all-mart-avenue-backend.vercel.app/orders/${orderId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updateData),
       });
-
- 
 
       // Update local state and remove from list if status is no longer pending
       setOrders(prev => prev.map(order =>
@@ -204,10 +203,10 @@ const CancelledOrders = () => {
     try {
       const promises = selectedOrders.map(orderId => {
         if (bulkAction === 'delete') {
-          return fetch(`http://localhost:8000/orders/${orderId}`, { method: 'DELETE' });
+          return fetch(`https://all-mart-avenue-backend.vercel.app/orders/${orderId}`, { method: 'DELETE' });
         } else {
           const status = bulkAction.replace('mark_', '') as Order['status'];
-          return fetch(`http://localhost:8000/orders/${orderId}`, {
+          return fetch(`https://all-mart-avenue-backend.vercel.app/orders/${orderId}`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ status }),
@@ -243,7 +242,7 @@ const CancelledOrders = () => {
   const handleDelete = async (order: Order) => {
     const result = await Swal.fire({
       title: 'Are you sure?',
-      text: `You are about to delete order "${order.orderNumber}". This action cannot be undone!`,
+      text: `You are about to delete order &quot;${order.orderNumber}&quot;. This action cannot be undone!`,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#dc2626',
@@ -260,7 +259,7 @@ const CancelledOrders = () => {
 
     const deleteToast = toast.loading('Deleting order...');
     try {
-      const response = await fetch(`http://localhost:8000/orders/${order._id}`, {
+      const response = await fetch(`https://all-mart-avenue-backend.vercel.app/orders/${order._id}`, {
         method: 'DELETE',
       });
 
@@ -406,11 +405,6 @@ const CancelledOrders = () => {
     toast.success(`SMS notification sent to ${order.customerInfo.phone}`);
   };
 
-  const sendEmailNotification = (order: Order) => {
-    // This would integrate with an email service in a real application
-    toast.success(`Email notification sent for order ${order.orderNumber}`);
-  };
-
   const printOrder = (order: Order) => {
     const printWindow = window.open('', '_blank');
     if (printWindow) {
@@ -506,7 +500,7 @@ const CancelledOrders = () => {
     }
   };
 
-  // Filter to show only pending orders by default
+  // Filter to show only cancelled orders by default
   const filteredAndSortedOrders = orders
     .filter(order => {
       const matchesSearch =
@@ -558,8 +552,8 @@ const CancelledOrders = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Pending Orders Management</h1>
-          <p className="text-muted-foreground">Manage and process pending customer orders</p>
+          <h1 className="text-3xl font-bold tracking-tight">Cancelled Orders Management</h1>
+          <p className="text-muted-foreground">Manage cancelled customer orders</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={exportOrders}>
@@ -573,7 +567,7 @@ const CancelledOrders = () => {
         </div>
       </div>
 
-      {/* Stats Cards - Only show pending stats */}
+      {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -584,14 +578,13 @@ const CancelledOrders = () => {
             <div className="text-2xl font-bold">{stats.total}</div>
           </CardContent>
         </Card>
-        <Card className="bg-yellow-50 border-yellow-200">
+        <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Pending</CardTitle>
             <Clock className="h-4 w-4 text-yellow-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-yellow-700">{stats.pending}</div>
-            <p className="text-xs text-yellow-600 mt-1">Awaiting processing</p>
           </CardContent>
         </Card>
         <Card>
@@ -621,13 +614,14 @@ const CancelledOrders = () => {
             <div className="text-2xl font-bold text-green-600">{stats.delivered}</div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="bg-red-50 border-red-200">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Revenue</CardTitle>
-            <Tag className="h-4 w-4 text-green-500" />
+            <CardTitle className="text-sm font-medium">Cancelled</CardTitle>
+            <XCircle className="h-4 w-4 text-red-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">৳{stats.revenue}</div>
+            <div className="text-2xl font-bold text-red-700">{stats.cancelled}</div>
+            <p className="text-xs text-red-600 mt-1">Cancelled orders</p>
           </CardContent>
         </Card>
       </div>
@@ -655,7 +649,7 @@ const CancelledOrders = () => {
                   <option value="mark_confirmed">Mark as Confirmed</option>
                   <option value="mark_shipped">Mark as Shipped</option>
                   <option value="mark_delivered">Mark as Delivered</option>
-                  <option value="mark_cancelled">Mark as Cancelled</option>
+                  <option value="mark_pending">Mark as Pending</option>
                   <option value="delete">Delete Orders</option>
                 </select>
                 <Button onClick={handleBulkAction} size="sm">
@@ -677,7 +671,7 @@ const CancelledOrders = () => {
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search pending orders by customer name, phone, or order number..."
+                placeholder="Search cancelled orders by customer name, phone, or order number..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -688,11 +682,11 @@ const CancelledOrders = () => {
               onChange={(e) => setSelectedStatus(e.target.value)}
               className="px-3 py-2 border rounded-md bg-background"
             >
-              <option value="pending">Pending Orders</option>
+              <option value="cancelled">Cancelled Orders</option>
+              <option value="pending">Pending</option>
               <option value="confirmed">Confirmed</option>
               <option value="shipped">Shipped</option>
               <option value="delivered">Delivered</option>
-              <option value="cancelled">Cancelled</option>
               <option value="returned">Returned</option>
             </select>
           </div>
@@ -703,11 +697,11 @@ const CancelledOrders = () => {
       <Card>
         <CardHeader>
           <CardTitle>
-            {selectedStatus === 'pending' ? 'Pending Orders' :
-              selectedStatus === 'confirmed' ? 'Confirmed Orders' :
-                selectedStatus === 'shipped' ? 'Shipped Orders' :
-                  selectedStatus === 'delivered' ? 'Delivered Orders' :
-                    selectedStatus === 'cancelled' ? 'Cancelled Orders' : 'Returned Orders'}
+            {selectedStatus === 'cancelled' ? 'Cancelled Orders' :
+              selectedStatus === 'pending' ? 'Pending Orders' :
+                selectedStatus === 'confirmed' ? 'Confirmed Orders' :
+                  selectedStatus === 'shipped' ? 'Shipped Orders' :
+                    selectedStatus === 'delivered' ? 'Delivered Orders' : 'Returned Orders'}
             ({filteredAndSortedOrders.length})
           </CardTitle>
         </CardHeader>
@@ -790,9 +784,9 @@ const CancelledOrders = () => {
                     </TableCell>
                     <TableCell>
                       <div className="flex flex-col">
-                        <span className="font-semibold">৳{order.grandTotal}</span>
+                        <span className="font-semibold">৳${order.grandTotal}</span>
                         <span className="text-xs text-muted-foreground">
-                          Items: ৳{order.subtotal} + Delivery: ৳{order.deliveryCharge}
+                          Items: ৳${order.subtotal} + Delivery: ৳${order.deliveryCharge}
                         </span>
                       </div>
                     </TableCell>
@@ -876,13 +870,13 @@ const CancelledOrders = () => {
               <div className="text-center py-8">
                 <ShoppingCart className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                 <h3 className="text-lg font-semibold">
-                  {selectedStatus === 'pending' ? 'No pending orders found' : 'No orders found'}
+                  {selectedStatus === 'cancelled' ? 'No cancelled orders found' : 'No orders found'}
                 </h3>
                 <p className="text-muted-foreground">
                   {searchTerm
                     ? 'Try adjusting your search criteria'
-                    : selectedStatus === 'pending'
-                      ? 'All pending orders have been processed'
+                    : selectedStatus === 'cancelled'
+                      ? 'All cancelled orders have been processed'
                       : `No ${selectedStatus} orders found`
                   }
                 </p>
@@ -1083,7 +1077,7 @@ const CancelledOrders = () => {
                 </div>
                 <div className="bg-muted p-3 rounded-md">
                   <p className="text-sm text-muted-foreground">
-                    This will update the order status to "Shipped" and send a notification to the customer.
+                    This will update the order status to &quot;Shipped&quot; and send a notification to the customer.
                   </p>
                 </div>
               </div>
@@ -1112,7 +1106,7 @@ const CancelledOrders = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the order "{orderToDelete?.orderNumber}" from your records.
+              This action cannot be undone. This will permanently delete the order &quot;{orderToDelete?.orderNumber}&quot; from your records.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

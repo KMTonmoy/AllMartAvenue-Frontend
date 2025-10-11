@@ -11,7 +11,7 @@ const Electronics = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await fetch("http://localhost:8000/products");
+        const res = await fetch("https://all-mart-avenue-backend.vercel.app/products");
         const data: Product[] = await res.json();
 
         // Filter only electronics

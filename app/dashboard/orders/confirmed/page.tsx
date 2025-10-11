@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -32,15 +32,12 @@ import {
 } from '@/components/ui/alert-dialog';
 import {
   Search,
-
   Trash2,
   Package,
-  Filter,
   RefreshCw,
   ArrowUpDown,
   Tag,
-   Info,
-
+  Info,
   ShoppingCart,
   User,
   Phone,
@@ -53,7 +50,7 @@ import {
   RotateCcw,
   Download,
   Printer,
-   MessageCircle,
+  MessageCircle,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Swal from 'sweetalert2';
@@ -112,7 +109,7 @@ const ConfirmedOrders = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState('confirmed'); // Default to pending
+  const [selectedStatus, setSelectedStatus] = useState('confirmed');
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [orderToDelete, setOrderToDelete] = useState<Order | null>(null);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
@@ -125,18 +122,6 @@ const ConfirmedOrders = () => {
   const [bulkAction, setBulkAction] = useState('');
   const [selectedOrders, setSelectedOrders] = useState<string[]>([]);
 
-  const statusOptions = [
-    { value: 'pending', label: 'Pending', color: 'yellow' },
-    { value: 'confirmed', label: 'Confirmed', color: 'blue' },
-    { value: 'shipped', label: 'Shipped', color: 'purple' },
-    { value: 'delivered', label: 'Delivered', color: 'green' },
-    { value: 'cancelled', label: 'Cancelled', color: 'red' },
-    { value: 'returned', label: 'Returned', color: 'orange' },
-  ];
-
-  const paymentMethods = ['Cash on Delivery', 'Credit Card', 'bKash', 'Nagad', 'Bank Transfer'];
-  const bulkActions = ['', 'mark_confirmed', 'mark_shipped', 'mark_delivered', 'mark_cancelled', 'delete'];
-
   useEffect(() => {
     fetchOrders();
   }, []);
@@ -145,7 +130,7 @@ const ConfirmedOrders = () => {
     const loadingToast = toast.loading('Loading orders...');
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:8000/orders');
+      const response = await fetch('https://all-mart-avenue-backend.vercel.app/orders');
       if (!response.ok) throw new Error('Failed to fetch orders');
       const data = await response.json();
       setOrders(data);
@@ -162,12 +147,12 @@ const ConfirmedOrders = () => {
     const updateToast = toast.loading(`Updating order to ${newStatus}...`);
 
     try {
-      const updateData: any = { status: newStatus };
+      const updateData: { status: Order['status']; trackingNumber?: string } = { status: newStatus };
       if (newStatus === 'shipped' && trackingNum) {
         updateData.trackingNumber = trackingNum;
       }
 
-      const response = await fetch(`http://localhost:8000/orders/${orderId}`, {
+      const response = await fetch(`https://all-mart-avenue-backend.vercel.app/orders/${orderId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updateData),
@@ -175,9 +160,9 @@ const ConfirmedOrders = () => {
 
       if (!response.ok) throw new Error('Failed to update order status');
 
-      const result = await response.json();
+      await response.json();
 
-      // Update local state and remove from list if status is no longer pending
+      // Update local state and remove from list if status is no longer confirmed
       setOrders(prev => prev.map(order =>
         order._id === orderId ? { ...order, status: newStatus, trackingNumber: trackingNum } : order
       ));
@@ -218,10 +203,10 @@ const ConfirmedOrders = () => {
     try {
       const promises = selectedOrders.map(orderId => {
         if (bulkAction === 'delete') {
-          return fetch(`http://localhost:8000/orders/${orderId}`, { method: 'DELETE' });
+          return fetch(`https://all-mart-avenue-backend.vercel.app/orders/${orderId}`, { method: 'DELETE' });
         } else {
           const status = bulkAction.replace('mark_', '') as Order['status'];
-          return fetch(`http://localhost:8000/orders/${orderId}`, {
+          return fetch(`https://all-mart-avenue-backend.vercel.app/orders/${orderId}`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ status }),
@@ -257,7 +242,7 @@ const ConfirmedOrders = () => {
   const handleDelete = async (order: Order) => {
     const result = await Swal.fire({
       title: 'Are you sure?',
-      text: `You are about to delete order "${order.orderNumber}". This action cannot be undone!`,
+      text: `You are about to delete order &quot;${order.orderNumber}&quot;. This action cannot be undone!`,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#dc2626',
@@ -274,7 +259,7 @@ const ConfirmedOrders = () => {
 
     const deleteToast = toast.loading('Deleting order...');
     try {
-      const response = await fetch(`http://localhost:8000/orders/${order._id}`, {
+      const response = await fetch(`https://all-mart-avenue-backend.vercel.app/orders/${order._id}`, {
         method: 'DELETE',
       });
 
@@ -420,11 +405,6 @@ const ConfirmedOrders = () => {
     toast.success(`SMS notification sent to ${order.customerInfo.phone}`);
   };
 
-  const sendEmailNotification = (order: Order) => {
-    // This would integrate with an email service in a real application
-    toast.success(`Email notification sent for order ${order.orderNumber}`);
-  };
-
   const printOrder = (order: Order) => {
     const printWindow = window.open('', '_blank');
     if (printWindow) {
@@ -520,7 +500,7 @@ const ConfirmedOrders = () => {
     }
   };
 
-  // Filter to show only pending orders by default
+  // Filter to show only confirmed orders by default
   const filteredAndSortedOrders = orders
     .filter(order => {
       const matchesSearch =
@@ -572,8 +552,8 @@ const ConfirmedOrders = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Pending Orders Management</h1>
-          <p className="text-muted-foreground">Manage and process pending customer orders</p>
+          <h1 className="text-3xl font-bold tracking-tight">Confirmed Orders Management</h1>
+          <p className="text-muted-foreground">Manage and process confirmed customer orders</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={exportOrders}>
@@ -587,7 +567,7 @@ const ConfirmedOrders = () => {
         </div>
       </div>
 
-      {/* Stats Cards - Only show pending stats */}
+      {/* Stats Cards - Focus on confirmed orders */}
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -598,23 +578,23 @@ const ConfirmedOrders = () => {
             <div className="text-2xl font-bold">{stats.total}</div>
           </CardContent>
         </Card>
-        <Card className="bg-yellow-50 border-yellow-200">
+        <Card className="bg-blue-50 border-blue-200">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pending</CardTitle>
-            <Clock className="h-4 w-4 text-yellow-600" />
+            <CardTitle className="text-sm font-medium">Confirmed</CardTitle>
+            <CheckCircle className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-yellow-700">{stats.pending}</div>
-            <p className="text-xs text-yellow-600 mt-1">Awaiting processing</p>
+            <div className="text-2xl font-bold text-blue-700">{stats.confirmed}</div>
+            <p className="text-xs text-blue-600 mt-1">Ready for shipping</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Confirmed</CardTitle>
-            <CheckCircle className="h-4 w-4 text-blue-500" />
+            <CardTitle className="text-sm font-medium">Pending</CardTitle>
+            <Clock className="h-4 w-4 text-yellow-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600">{stats.confirmed}</div>
+            <div className="text-2xl font-bold text-yellow-600">{stats.pending}</div>
           </CardContent>
         </Card>
         <Card>
@@ -666,7 +646,6 @@ const ConfirmedOrders = () => {
                   className="px-3 py-2 border rounded-md bg-white text-sm"
                 >
                   <option value="">Choose action...</option>
-                  <option value="mark_confirmed">Mark as Confirmed</option>
                   <option value="mark_shipped">Mark as Shipped</option>
                   <option value="mark_delivered">Mark as Delivered</option>
                   <option value="mark_cancelled">Mark as Cancelled</option>
@@ -691,7 +670,7 @@ const ConfirmedOrders = () => {
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search pending orders by customer name, phone, or order number..."
+                placeholder="Search confirmed orders by customer name, phone, or order number..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -702,8 +681,8 @@ const ConfirmedOrders = () => {
               onChange={(e) => setSelectedStatus(e.target.value)}
               className="px-3 py-2 border rounded-md bg-background"
             >
-              <option value="pending">Pending Orders</option>
-              <option value="confirmed">Confirmed</option>
+              <option value="confirmed">Confirmed Orders</option>
+              <option value="pending">Pending</option>
               <option value="shipped">Shipped</option>
               <option value="delivered">Delivered</option>
               <option value="cancelled">Cancelled</option>
@@ -717,8 +696,8 @@ const ConfirmedOrders = () => {
       <Card>
         <CardHeader>
           <CardTitle>
-            {selectedStatus === 'pending' ? 'Pending Orders' :
-              selectedStatus === 'confirmed' ? 'Confirmed Orders' :
+            {selectedStatus === 'confirmed' ? 'Confirmed Orders' :
+              selectedStatus === 'pending' ? 'Pending Orders' :
                 selectedStatus === 'shipped' ? 'Shipped Orders' :
                   selectedStatus === 'delivered' ? 'Delivered Orders' :
                     selectedStatus === 'cancelled' ? 'Cancelled Orders' : 'Returned Orders'}
@@ -890,13 +869,13 @@ const ConfirmedOrders = () => {
               <div className="text-center py-8">
                 <ShoppingCart className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                 <h3 className="text-lg font-semibold">
-                  {selectedStatus === 'pending' ? 'No pending orders found' : 'No orders found'}
+                  {selectedStatus === 'confirmed' ? 'No confirmed orders found' : 'No orders found'}
                 </h3>
                 <p className="text-muted-foreground">
                   {searchTerm
                     ? 'Try adjusting your search criteria'
-                    : selectedStatus === 'pending'
-                      ? 'All pending orders have been processed'
+                    : selectedStatus === 'confirmed'
+                      ? 'All confirmed orders have been processed'
                       : `No ${selectedStatus} orders found`
                   }
                 </p>
@@ -1097,7 +1076,7 @@ const ConfirmedOrders = () => {
                 </div>
                 <div className="bg-muted p-3 rounded-md">
                   <p className="text-sm text-muted-foreground">
-                    This will update the order status to "Shipped" and send a notification to the customer.
+                    This will update the order status to &quot;Shipped&quot; and send a notification to the customer.
                   </p>
                 </div>
               </div>
@@ -1126,7 +1105,7 @@ const ConfirmedOrders = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the order "{orderToDelete?.orderNumber}" from your records.
+              This action cannot be undone. This will permanently delete the order &quot;{orderToDelete?.orderNumber}&quot; from your records.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

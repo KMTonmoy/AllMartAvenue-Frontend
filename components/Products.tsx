@@ -15,7 +15,7 @@ const Products = () => {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        const response = await axios.get<Product[]>("http://localhost:8000/products");
+        const response = await axios.get<Product[]>("https://all-mart-avenue-backend.vercel.app/products");
         setProducts(response.data);
         setError(null);
       } catch (err) {

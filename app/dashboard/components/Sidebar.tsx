@@ -226,18 +226,18 @@ const NavContent = ({ mobile = false, setOpen, width = 320, onLogout }: { mobile
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
   const pathname = usePathname();
 
-  const fetchBannersCount = async () => {
+  const fetchBannersCount = useCallback(async () => {
     try {
-      const response = await axios.get<Banner[]>('http://localhost:8000/banners');
+      const response = await axios.get<Banner[]>('https://all-mart-avenue-backend.vercel.app/banners');
       setBannersCount(response.data.length);
     } catch {
       setBannersCount(0);
     }
-  };
+  }, []);
 
-  const fetchProductsCount = async () => {
+  const fetchProductsCount = useCallback(async () => {
     try {
-      const response = await axios.get<Product[]>('http://localhost:8000/products');
+      const response = await axios.get<Product[]>('https://all-mart-avenue-backend.vercel.app/products');
       const products = response.data;
       setProductsCount(products.length);
       const outOfStockProducts = products.filter(product => product.stock === 0);
@@ -246,11 +246,11 @@ const NavContent = ({ mobile = false, setOpen, width = 320, onLogout }: { mobile
       setProductsCount(0);
       setOutOfStockCount(0);
     }
-  };
+  }, []);
 
-  const fetchOrdersCount = async () => {
+  const fetchOrdersCount = useCallback(async () => {
     try {
-      const response = await axios.get<Order[]>('http://localhost:8000/orders');
+      const response = await axios.get<Order[]>('https://all-mart-avenue-backend.vercel.app/orders');
       const orders = response.data;
 
       setOrdersCount({
@@ -273,9 +273,9 @@ const NavContent = ({ mobile = false, setOpen, width = 320, onLogout }: { mobile
         returned: 0
       });
     }
-  };
+  }, []);
 
-  const fetchAllData = async () => {
+  const fetchAllData = useCallback(async () => {
     try {
       setLoading(true);
       await Promise.all([fetchBannersCount(), fetchProductsCount(), fetchOrdersCount()]);
@@ -285,13 +285,13 @@ const NavContent = ({ mobile = false, setOpen, width = 320, onLogout }: { mobile
     } finally {
       setLoading(false);
     }
-  };
+  }, [fetchBannersCount, fetchProductsCount, fetchOrdersCount]);
 
   useEffect(() => {
     fetchAllData();
     const interval = setInterval(fetchAllData, 30000);
     return () => clearInterval(interval);
-  }, []);
+  }, [fetchAllData]);
 
   const updatedMenuItems = menuItems.map(item => {
     if (item.name === 'Products') {

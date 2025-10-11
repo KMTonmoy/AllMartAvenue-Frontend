@@ -35,7 +35,7 @@ const BannerManager: React.FC = () => {
   useEffect(() => {
     const fetchBanners = async () => {
       try {
-        const res = await fetch('http://localhost:8000/banners');
+        const res = await fetch('https://all-mart-avenue-backend.vercel.app/banners');
         if (!res.ok) throw new Error('Failed to fetch banners');
         const data = await res.json();
         setBanners(data);
@@ -140,7 +140,7 @@ const BannerManager: React.FC = () => {
     });
     if (!confirm.isConfirmed) return;
     try {
-      const res = await fetch(`http://localhost:8000/banners/${id}`, { method: 'DELETE' });
+      const res = await fetch(`https://all-mart-avenue-backend.vercel.app/banners/${id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error('Failed to delete');
       setBanners(prev => prev.filter(b => b._id !== id));
       // Adjust current slide if needed
@@ -162,8 +162,8 @@ const BannerManager: React.FC = () => {
 
     try {
       const url = isCreateMode
-        ? 'http://localhost:8000/banners'
-        : `http://localhost:8000/banners/${formData._id}`;
+        ? 'https://all-mart-avenue-backend.vercel.app/banners'
+        : `https://all-mart-avenue-backend.vercel.app/banners/${formData._id}`;
       const method = isCreateMode ? 'POST' : 'PUT';
       const res = await fetch(url, {
         method,

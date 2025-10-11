@@ -121,7 +121,7 @@ const OutOfStock = () => {
     const loadingToast = toast.loading('Loading out of stock products...');
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:8000/products');
+      const response = await fetch('https://all-mart-avenue-backend.vercel.app/products');
       if (!response.ok) throw new Error('Failed to fetch products');
       const data = await response.json();
       setProducts(data);
@@ -262,7 +262,7 @@ const OutOfStock = () => {
     const updateToast = toast.loading('Updating product...');
 
     try {
-      const response = await fetch(`http://localhost:8000/products/${editingProduct._id}`, {
+      const response = await fetch(`https://all-mart-avenue-backend.vercel.app/products/${editingProduct._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -272,7 +272,7 @@ const OutOfStock = () => {
 
       if (!response.ok) throw new Error('Failed to update product');
 
- 
+
       setProducts(prev => prev.map(product =>
         product._id === editingProduct._id ? { ...editingProduct } : product
       ));
@@ -308,7 +308,7 @@ const OutOfStock = () => {
 
     const deleteToast = toast.loading('Deleting product...');
     try {
-      const response = await fetch(`http://localhost:8000/products/${product._id}`, {
+      const response = await fetch(`https://all-mart-avenue-backend.vercel.app/products/${product._id}`, {
         method: 'DELETE',
       });
 
@@ -1132,7 +1132,7 @@ const OutOfStock = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the product "{productToDelete?.name}" from your inventory.
+              This action cannot be undone. This will permanently delete the product &quot;{productToDelete?.name}&quot; from your inventory.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

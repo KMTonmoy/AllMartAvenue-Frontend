@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -32,15 +32,12 @@ import {
 } from '@/components/ui/alert-dialog';
 import {
   Search,
-
   Trash2,
   Package,
-
   RefreshCw,
   ArrowUpDown,
   Tag,
-   Info,
-
+  Info,
   ShoppingCart,
   User,
   Phone,
@@ -53,7 +50,6 @@ import {
   RotateCcw,
   Download,
   Printer,
-  Mail,
   MessageCircle,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -109,6 +105,11 @@ interface Order {
 // Extended type for sorting that includes nested properties
 type SortableField = keyof Order | 'customerName' | 'customerPhone';
 
+interface StatusUpdateData {
+  status: Order['status'];
+  trackingNumber?: string;
+}
+
 const PendingOrders = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
@@ -126,17 +127,6 @@ const PendingOrders = () => {
   const [bulkAction, setBulkAction] = useState('');
   const [selectedOrders, setSelectedOrders] = useState<string[]>([]);
 
-  const statusOptions = [
-    { value: 'pending', label: 'Pending', color: 'yellow' },
-    { value: 'confirmed', label: 'Confirmed', color: 'blue' },
-    { value: 'shipped', label: 'Shipped', color: 'purple' },
-    { value: 'delivered', label: 'Delivered', color: 'green' },
-    { value: 'cancelled', label: 'Cancelled', color: 'red' },
-    { value: 'returned', label: 'Returned', color: 'orange' },
-  ];
-
-  const paymentMethods = ['Cash on Delivery', 'Credit Card', 'bKash', 'Nagad', 'Bank Transfer'];
-  const bulkActions = ['', 'mark_confirmed', 'mark_shipped', 'mark_delivered', 'mark_cancelled', 'delete'];
 
   useEffect(() => {
     fetchOrders();
@@ -146,7 +136,7 @@ const PendingOrders = () => {
     const loadingToast = toast.loading('Loading orders...');
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:8000/orders');
+      const response = await fetch('https://all-mart-avenue-backend.vercel.app/orders');
       if (!response.ok) throw new Error('Failed to fetch orders');
       const data = await response.json();
       setOrders(data);
@@ -163,20 +153,18 @@ const PendingOrders = () => {
     const updateToast = toast.loading(`Updating order to ${newStatus}...`);
 
     try {
-      const updateData: any = { status: newStatus };
+      const updateData: StatusUpdateData = { status: newStatus };
       if (newStatus === 'shipped' && trackingNum) {
         updateData.trackingNumber = trackingNum;
       }
 
-      const response = await fetch(`http://localhost:8000/orders/${orderId}`, {
+      const response = await fetch(`https://all-mart-avenue-backend.vercel.app/orders/${orderId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updateData),
       });
 
       if (!response.ok) throw new Error('Failed to update order status');
-
-      const result = await response.json();
 
       // Update local state and remove from list if status is no longer pending
       setOrders(prev => prev.map(order =>
@@ -219,10 +207,10 @@ const PendingOrders = () => {
     try {
       const promises = selectedOrders.map(orderId => {
         if (bulkAction === 'delete') {
-          return fetch(`http://localhost:8000/orders/${orderId}`, { method: 'DELETE' });
+          return fetch(`https://all-mart-avenue-backend.vercel.app/orders/${orderId}`, { method: 'DELETE' });
         } else {
           const status = bulkAction.replace('mark_', '') as Order['status'];
-          return fetch(`http://localhost:8000/orders/${orderId}`, {
+          return fetch(`https://all-mart-avenue-backend.vercel.app/orders/${orderId}`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ status }),
@@ -258,7 +246,7 @@ const PendingOrders = () => {
   const handleDelete = async (order: Order) => {
     const result = await Swal.fire({
       title: 'Are you sure?',
-      text: `You are about to delete order "${order.orderNumber}". This action cannot be undone!`,
+      text: `You are about to delete order &quot;${order.orderNumber}&quot;. This action cannot be undone!`,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#dc2626',
@@ -275,7 +263,7 @@ const PendingOrders = () => {
 
     const deleteToast = toast.loading('Deleting order...');
     try {
-      const response = await fetch(`http://localhost:8000/orders/${order._id}`, {
+      const response = await fetch(`https://all-mart-avenue-backend.vercel.app/orders/${order._id}`, {
         method: 'DELETE',
       });
 
@@ -419,11 +407,6 @@ const PendingOrders = () => {
   const sendSMSNotification = (order: Order) => {
     // This would integrate with an SMS service in a real application
     toast.success(`SMS notification sent to ${order.customerInfo.phone}`);
-  };
-
-  const sendEmailNotification = (order: Order) => {
-    // This would integrate with an email service in a real application
-    toast.success(`Email notification sent for order ${order.orderNumber}`);
   };
 
   const printOrder = (order: Order) => {
@@ -1098,7 +1081,7 @@ const PendingOrders = () => {
                 </div>
                 <div className="bg-muted p-3 rounded-md">
                   <p className="text-sm text-muted-foreground">
-                    This will update the order status to "Shipped" and send a notification to the customer.
+                    This will update the order status to &quot;Shipped&quot; and send a notification to the customer.
                   </p>
                 </div>
               </div>
@@ -1127,7 +1110,7 @@ const PendingOrders = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the order "{orderToDelete?.orderNumber}" from your records.
+              This action cannot be undone. This will permanently delete the order &quot;{orderToDelete?.orderNumber}&quot; from your records.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

@@ -139,7 +139,7 @@ const AllProducts = () => {
     const loadingToast = toast.loading('Loading products...');
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:8000/products');
+      const response = await fetch('https://all-mart-avenue-backend.vercel.app/products');
       if (!response.ok) throw new Error('Failed to fetch products');
       const data = await response.json();
       setProducts(data);
@@ -322,7 +322,7 @@ const AllProducts = () => {
 
     const deleteToast = toast.loading('Deleting product...');
     try {
-      const response = await fetch(`http://localhost:8000/products/${product._id}`, {
+      const response = await fetch(`https://all-mart-avenue-backend.vercel.app/products/${product._id}`, {
         method: 'DELETE',
       });
 
@@ -374,7 +374,7 @@ const AllProducts = () => {
 
     const saveToast = toast.loading('Updating product...');
     try {
-      const response = await fetch(`http://localhost:8000/products/${editingProduct._id}`, {
+      const response = await fetch(`https://all-mart-avenue-backend.vercel.app/products/${editingProduct._id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(editingProduct),
@@ -411,7 +411,7 @@ const AllProducts = () => {
 
     const addToast = toast.loading('Adding product...');
     try {
-      const response = await fetch('http://localhost:8000/products', {
+      const response = await fetch('https://all-mart-avenue-backend.vercel.app/products', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newProduct),
