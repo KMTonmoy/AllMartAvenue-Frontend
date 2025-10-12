@@ -1,10 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Inter } from 'next/font/google';
 import Sidebar from './components/Sidebar';
-
-const inter = Inter({ subsets: ['latin'] });
 
 export default function DashboardLayout({
   children,
@@ -15,36 +12,24 @@ export default function DashboardLayout({
   const router = useRouter();
 
   useEffect(() => {
-    // Check if user is authenticated
-    const checkAuth = () => {
-      const adminData = localStorage.getItem('adminAuth');
-      if (adminData) {
-        const { username, password, timestamp } = JSON.parse(adminData);
-
-        // Check if session is expired (24 hours)
-        const isExpired = Date.now() - timestamp > 24 * 60 * 60 * 1000;
-
-        if (!isExpired && username === 'emran@allmart' && password === 'emranallmart12385') {
-          setIsAuthenticated(true);
-        } else {
-          localStorage.removeItem('adminAuth');
-          setIsAuthenticated(false);
-        }
+    const adminData = localStorage.getItem('adminAuth');
+    if (adminData) {
+      const { username, password, timestamp } = JSON.parse(adminData);
+      const isExpired = Date.now() - timestamp > 24 * 60 * 60 * 1000;
+      if (!isExpired && username === 'emran@allmart' && password === 'emranallmart12385') {
+        setIsAuthenticated(true);
       } else {
+        localStorage.removeItem('adminAuth');
         setIsAuthenticated(false);
       }
-    };
-
-    checkAuth();
+    } else {
+      setIsAuthenticated(false);
+    }
   }, []);
 
   const handleLogin = (username: string, password: string) => {
     if (username === 'emran@allmart' && password === 'emranallmart12385') {
-      const authData = {
-        username,
-        password,
-        timestamp: Date.now()
-      };
+      const authData = { username, password, timestamp: Date.now() };
       localStorage.setItem('adminAuth', JSON.stringify(authData));
       setIsAuthenticated(true);
     } else {
@@ -61,46 +46,29 @@ export default function DashboardLayout({
 
   if (isAuthenticated === null) {
     return (
-      <html lang="en">
-        <body className={inter.className}>
-          <div className="flex h-screen bg-gray-50 items-center justify-center">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-              <p className="mt-4 text-gray-600">Checking authentication...</p>
-            </div>
-          </div>
-        </body>
-      </html>
+      <div className="flex h-screen bg-gray-50 items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Checking authentication...</p>
+        </div>
+      </div>
     );
   }
 
   if (!isAuthenticated) {
-    return (
-      <html lang="en">
-        <body className={inter.className}>
-          <LoginForm onLogin={handleLogin} />
-        </body>
-      </html>
-    );
+    return <LoginForm onLogin={handleLogin} />;
   }
 
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        <div className="flex h-screen bg-gray-50">
-          <Sidebar onLogout={handleLogout} />
-          <main className="flex-1 lg:ml-0 overflow-auto">
-            <div className="p-6">
-              {children}
-            </div>
-          </main>
-        </div>
-      </body>
-    </html>
+    <div className="flex h-screen bg-gray-50">
+      <Sidebar onLogout={handleLogout} />
+      <main className="flex-1 lg:ml-0 overflow-auto">
+        <div className="p-6">{children}</div>
+      </main>
+    </div>
   );
 }
 
-// Login Form Component
 function LoginForm({ onLogin }: { onLogin: (username: string, password: string) => void }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -109,8 +77,6 @@ function LoginForm({ onLogin }: { onLogin: (username: string, password: string) 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-
-    // Simulate API call delay
     setTimeout(() => {
       onLogin(username, password);
       setIsLoading(false);
@@ -132,9 +98,7 @@ function LoginForm({ onLogin }: { onLogin: (username: string, password: string) 
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
-              Username
-            </label>
+            <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">Username</label>
             <input
               id="username"
               type="text"
@@ -145,11 +109,8 @@ function LoginForm({ onLogin }: { onLogin: (username: string, password: string) 
               required
             />
           </div>
-
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-              Password
-            </label>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">Password</label>
             <input
               id="password"
               type="password"
@@ -160,9 +121,6 @@ function LoginForm({ onLogin }: { onLogin: (username: string, password: string) 
               required
             />
           </div>
-
-     
-
           <button
             type="submit"
             disabled={isLoading}
@@ -181,7 +139,7 @@ function LoginForm({ onLogin }: { onLogin: (username: string, password: string) 
 
         <div className="mt-6 text-center">
           <button
-            onClick={() => window.location.href = '/'}
+            onClick={() => (window.location.href = '/')}
             className="text-blue-600 hover:text-blue-700 text-sm font-medium"
           >
             ← Back to Home Page

@@ -4,55 +4,61 @@ import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Play, Pause } from "lucide-react";
 import { cn } from "@/lib/utils";
+import axios from "axios";
+
+interface Banner {
+  _id: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  buttonText: string;
+  image: string;
+  isActive: boolean;
+}
 
 const Hero = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
+  const [slides, setSlides] = useState<Banner[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const slides = [
-    {
-      id: 1,
-      title: "Summer Collection 2023",
-      subtitle: "Discover the latest trends in fashion",
-      description: "Get up to 50% off on all summer items. Limited time offer!",
-      buttonText: "Shop Now",
-      image:
-        "https://images.unsplash.com/photo-1496747611176-843222e1e57c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2073&q=80",
-    },
-    {
-      id: 2,
-      title: "Electronics Sale",
-      subtitle: "Cutting-edge technology at your fingertips",
-      description: "Latest gadgets and electronics with exclusive discounts",
-      buttonText: "Explore Electronics",
-      image:
-        "https://images.unsplash.com/photo-1498049794561-7780e7231661?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80",
-    },
-    {
-      id: 3,
-      title: "Premium Jewelry",
-      subtitle: "Elegance redefined",
-      description: "Exquisite pieces crafted with precision and care",
-      buttonText: "View Collection",
-      image:
-        "https://images.unsplash.com/photo-1605100804763-247f67b3557e?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80",
-    },
-    {
-      id: 4,
-      title: "Home Essentials",
-      subtitle: "Transform your living space",
-      description: "Everything you need to make your house a home",
-      buttonText: "Discover More",
-      image:
-        "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&auto=format&fit=crop&w=2058&q=80",
-    },
-  ];
-
+  // Fetch banners from backend API
   useEffect(() => {
-    if (!isPlaying) return;
+    const fetchBanners = async () => {
+      try {
+        const response = await axios.get("https://all-mart-avenue-backend.vercel.app/banners");
+        // Filter only active banners and map to the required format
+        const activeBanners = response.data
+          .filter((banner: Banner) => banner.isActive)
+          .map((banner: Banner) => ({
+            id: banner._id,
+            title: banner.title,
+            subtitle: banner.subtitle,
+            description: banner.description,
+            buttonText: banner.buttonText,
+            image: banner.image,
+          }));
+        setSlides(activeBanners);
+      } catch (error) {
+        console.error("Error fetching banners:", error);
+        // Fallback to empty array if fetch fails
+        setSlides([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBanners();
+  }, []);
+
+  // Auto-play effect
+  useEffect(() => {
+    if (!isPlaying || slides.length === 0) return;
+
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length);
     }, 5000);
+
     return () => clearInterval(interval);
   }, [isPlaying, slides.length]);
 
@@ -72,12 +78,29 @@ const Hero = () => {
     setIsPlaying(!isPlaying);
   };
 
+  // Show loading state or empty state
+  if (loading) {
+    return (
+      <section className="relative h-[80vh] w-full overflow-hidden flex items-center justify-center">
+        <div className="text-white text-lg">Loading banners...</div>
+      </section>
+    );
+  }
+
+  if (slides.length === 0) {
+    return (
+      <section className="relative h-[80vh] w-full overflow-hidden flex items-center justify-center">
+        <div className="text-white text-lg">No banners available</div>
+      </section>
+    );
+  }
+
   return (
     <section className="relative h-[80vh] w-full overflow-hidden">
       <div className="relative h-full w-full">
         {slides.map((slide, index) => (
           <div
-            key={slide.id}
+            key={slide._id}
             className={cn(
               "absolute inset-0 h-full w-full transition-opacity duration-700",
               currentSlide === index ? "opacity-100" : "opacity-0"

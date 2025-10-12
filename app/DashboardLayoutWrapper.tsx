@@ -6,7 +6,7 @@ import Footer from "@/components/Footer";
 export default function DashboardLayoutWrapper({
   children
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   const pathname = usePathname();
   const isDashboardPage = pathname?.startsWith('/dashboard');

@@ -142,7 +142,22 @@ const AllProducts = () => {
       const response = await fetch('https://all-mart-avenue-backend.vercel.app/products');
       if (!response.ok) throw new Error('Failed to fetch products');
       const data = await response.json();
-      setProducts(data);
+
+      // Ensure all products have required arrays initialized
+      const sanitizedProducts = data.map((product: Product) => ({
+        ...product,
+        colors: product.colors || [],
+        images: product.images || [],
+        features: product.features || [],
+        name: product.name || 'Unnamed Product',
+        category: product.category || 'uncategorized',
+        price: product.price || '0',
+        originalPrice: product.originalPrice || '0',
+        stock: product.stock || 0,
+        productTag: product.productTag || 'normal'
+      }));
+
+      setProducts(sanitizedProducts);
 
       toast.success('Products loaded successfully!', {
         id: loadingToast,
@@ -479,9 +494,14 @@ const AllProducts = () => {
 
   const filteredAndSortedProducts = products
     .filter(product => {
-      const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.category.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
+      // Fixed: Added null checks for product.name and product.category
+      const productName = product?.name || '';
+      const productCategory = product?.category || '';
+      const searchTermLower = searchTerm.toLowerCase();
+
+      const matchesSearch = productName.toLowerCase().includes(searchTermLower) ||
+        productCategory.toLowerCase().includes(searchTermLower);
+      const matchesCategory = selectedCategory === 'all' || productCategory === selectedCategory;
       return matchesSearch && matchesCategory;
     })
     .sort((a, b) => {
@@ -497,8 +517,8 @@ const AllProducts = () => {
       }
 
       if (sortField === 'price' || sortField === 'originalPrice') {
-        const aNum = parseFloat(aValue as string);
-        const bNum = parseFloat(bValue as string);
+        const aNum = parseFloat(aValue as string) || 0;
+        const bNum = parseFloat(bValue as string) || 0;
         return sortDirection === 'asc' ? aNum - bNum : bNum - aNum;
       }
 
@@ -630,13 +650,13 @@ const AllProducts = () => {
               <TableRow key={product._id} className="hover:bg-muted/50">
                 <TableCell className="font-medium"><div className="flex items-center gap-3">
                   <Image
-                    src={product.images[0]}
-                    alt={product.name}
+                    src={product.images?.[0] || '/placeholder-image.jpg'}
+                    alt={product.name || 'Product image'}
                     width={40}
                     height={40}
                     className="w-10 h-10 rounded-md object-cover border"
                   />
-                  <div className="flex-1 min-w-0"><p className="font-semibold truncate">{product.name}</p></div>
+                  <div className="flex-1 min-w-0"><p className="font-semibold truncate">{product.name || 'Unnamed Product'}</p></div>
                 </div></TableCell>
                 <TableCell><Badge variant={getCategoryBadgeVariant(product.category)}>{product.category}</Badge></TableCell>
                 <TableCell><div className="flex flex-col"><span className="font-semibold">${product.price}</span>
@@ -644,10 +664,24 @@ const AllProducts = () => {
                 </div></TableCell>
                 <TableCell><Badge variant={getStockBadgeVariant(product.stock)}>{product.stock} in stock</Badge></TableCell>
                 <TableCell><Badge variant={getTagBadgeVariant(product.productTag)}>{product.productTag}</Badge></TableCell>
-                <TableCell><div className="flex gap-1">{product.colors.slice(0, 3).map((color, index) => (
-                  <div key={index} className="w-4 h-4 rounded-full border" style={{ backgroundColor: color.value }} title={color.name} />
-                ))}{product.colors.length > 3 && <div className="text-xs text-muted-foreground">+{product.colors.length - 3}</div>}
-                </div></TableCell>
+                <TableCell>
+                  <div className="flex gap-1">
+                    {/* Fixed: Added safe array access for colors */}
+                    {(product.colors || []).slice(0, 3).map((color, index) => (
+                      <div
+                        key={index}
+                        className="w-4 h-4 rounded-full border"
+                        style={{ backgroundColor: color.value }}
+                        title={color.name}
+                      />
+                    ))}
+                    {(product.colors || []).length > 3 && (
+                      <div className="text-xs text-muted-foreground">
+                        +{(product.colors || []).length - 3}
+                      </div>
+                    )}
+                  </div>
+                </TableCell>
                 <TableCell className="text-right"><div className="flex justify-end gap-2">
                   <Button variant="outline" size="sm" onClick={() => handleViewDetails(product)} className="h-8 px-2"><Info className="h-3 w-3" /></Button>
                   <Button variant="outline" size="sm" onClick={() => handleEditProduct(product)} className="h-8 px-2"><Edit className="h-3 w-3" /></Button>
@@ -952,22 +986,25 @@ const AllProducts = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <Image
-                  src={selectedProduct.images[0]}
-                  alt={selectedProduct.name}
+                  src={selectedProduct.images?.[0] || '/placeholder-image.jpg'}
+                  alt={selectedProduct.name || 'Product image'}
                   width={400}
                   height={256}
                   className="w-full h-64 object-cover rounded-lg mb-4 border"
                 />
-                <div className="grid grid-cols-3 gap-2">{selectedProduct.images.slice(1).map((image, index) => (
-                  <Image
-                    key={index}
-                    src={image}
-                    alt={`${selectedProduct.name} ${index + 2}`}
-                    width={100}
-                    height={80}
-                    className="w-full h-20 object-cover rounded-md border"
-                  />
-                ))}</div>
+                <div className="grid grid-cols-3 gap-2">
+                  {/* Fixed: Added safe array access for images */}
+                  {(selectedProduct.images || []).slice(1).map((image, index) => (
+                    <Image
+                      key={index}
+                      src={image}
+                      alt={`${selectedProduct.name} ${index + 2}`}
+                      width={100}
+                      height={80}
+                      className="w-full h-20 object-cover rounded-md border"
+                    />
+                  ))}
+                </div>
                 {selectedProduct.videoURL && (<div className="mt-4"><h4 className="font-semibold mb-2 flex items-center gap-2"><Youtube className="h-4 w-4 text-red-600" />Product Video</h4>
                   <div className="aspect-video bg-muted rounded-lg flex items-center justify-center"><iframe src={selectedProduct.videoURL} className="w-full h-full rounded-lg" allowFullScreen /></div>
                 </div>)}
@@ -981,12 +1018,25 @@ const AllProducts = () => {
                       <Badge variant="secondary">{selectedProduct.discount}% OFF</Badge></>)}</div></div>
                   <div><h4 className="font-semibold mb-2">Stock</h4><Badge variant={getStockBadgeVariant(selectedProduct.stock)}>{selectedProduct.stock} units</Badge></div>
                 </div>
-                <div><h4 className="font-semibold mb-2">Colors</h4><div className="flex gap-2 flex-wrap">{selectedProduct.colors.map((color, index) => (
-                  <div key={index} className="flex items-center gap-2"><div className="w-6 h-6 rounded-full border" style={{ backgroundColor: color.value }} />
-                    <span className="text-sm">{color.name}</span></div>
-                ))}</div></div>
-                <div><h4 className="font-semibold mb-2">Features</h4><ul className="text-sm text-muted-foreground list-disc list-inside space-y-1">
-                  {selectedProduct.features.map((feature, index) => (<li key={index}>{feature}</li>))}</ul></div>
+                <div><h4 className="font-semibold mb-2">Colors</h4>
+                  <div className="flex gap-2 flex-wrap">
+                    {/* Fixed: Added safe array access for colors */}
+                    {(selectedProduct.colors || []).map((color, index) => (
+                      <div key={index} className="flex items-center gap-2">
+                        <div className="w-6 h-6 rounded-full border" style={{ backgroundColor: color.value }} />
+                        <span className="text-sm">{color.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div><h4 className="font-semibold mb-2">Features</h4>
+                  <ul className="text-sm text-muted-foreground list-disc list-inside space-y-1">
+                    {/* Fixed: Added safe array access for features */}
+                    {(selectedProduct.features || []).map((feature, index) => (
+                      <li key={index}>{feature}</li>
+                    ))}
+                  </ul>
+                </div>
               </div>
             </div>
             <DialogFooter><Button variant="outline" onClick={() => setViewDialogOpen(false)}>Close</Button>
