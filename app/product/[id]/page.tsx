@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import axios from 'axios';
-import { Copy, ShoppingCart, Zap } from 'lucide-react';
+import { Copy, ShoppingCart, Zap, Share2, Facebook, MessageCircle, Twitter, Send } from 'lucide-react';
 import { Product } from '@/types/product';
 import Breadcrumb from '@/components/ProductDetails/Breadcrumb';
 import ProductImageGallery from '@/components/ProductDetails/ProductImageGallery';
@@ -34,6 +34,7 @@ const ProductDetails: React.FC = () => {
   const [currentProduct, setCurrentProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [showShareOptions, setShowShareOptions] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -82,9 +83,27 @@ const ProductDetails: React.FC = () => {
     if (!currentProduct) return;
 
     const productUrl = `${window.location.origin}/product/${currentProduct._id}`;
+
+    // Check if Web Share API is supported (mobile devices)
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: currentProduct.name,
+          text: `Check out ${currentProduct.name} on AllMart Avenue!`,
+          url: productUrl,
+        });
+        setShowShareOptions(false);
+        return;
+      } catch (error) {
+        console.log('Web Share API failed, falling back to clipboard');
+      }
+    }
+
+    // Fallback to clipboard for desktop
     try {
       await navigator.clipboard.writeText(productUrl);
       showNotificationMessage('Product link copied to clipboard!');
+      setShowShareOptions(false);
     } catch {
       const textArea = document.createElement('textarea');
       textArea.value = productUrl;
@@ -93,7 +112,71 @@ const ProductDetails: React.FC = () => {
       document.execCommand('copy');
       document.body.removeChild(textArea);
       showNotificationMessage('Product link copied to clipboard!');
+      setShowShareOptions(false);
     }
+  };
+
+  const handleSocialShare = (platform: string): void => {
+    if (!currentProduct) return;
+
+    const productUrl = `${window.location.origin}/product/${currentProduct._id}`;
+    const shareText = `Check out ${currentProduct.name} on AllMart Avenue! ${productUrl}`;
+    const encodedUrl = encodeURIComponent(productUrl);
+    const encodedText = encodeURIComponent(`Check out ${currentProduct.name} on AllMart Avenue!`);
+
+    let shareUrl = '';
+
+    switch (platform) {
+      case 'facebook':
+        // Facebook Share Dialog
+        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}&quote=${encodedText}`;
+        window.open(shareUrl, 'facebook-share-dialog', 'width=800,height=600');
+        break;
+
+      case 'whatsapp':
+        // WhatsApp - works on both mobile and desktop
+        if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+          // Mobile - will open WhatsApp app directly
+          shareUrl = `whatsapp://send?text=${encodeURIComponent(shareText)}`;
+          window.location.href = shareUrl;
+        } else {
+          // Desktop - open web.whatsapp.com
+          shareUrl = `https://web.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
+          window.open(shareUrl, '_blank', 'width=800,height=600');
+        }
+        break;
+
+      case 'messenger':
+        // Facebook Messenger
+        if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+          // Mobile - try to open Messenger app
+          shareUrl = `fb-messenger://share?link=${encodedUrl}`;
+          window.location.href = shareUrl;
+        } else {
+          // Desktop - open messenger.com
+          shareUrl = `https://www.messenger.com/new`;
+          window.open(shareUrl, '_blank', 'width=800,height=600');
+          // Note: Messenger desktop doesn't support pre-filled messages for security reasons
+        }
+        break;
+
+      case 'twitter':
+        // Twitter
+        shareUrl = `https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedUrl}`;
+        window.open(shareUrl, 'twitter-share', 'width=800,height=400');
+        break;
+
+      case 'telegram':
+        // Telegram
+        shareUrl = `https://t.me/share/url?url=${encodedUrl}&text=${encodedText}`;
+        window.open(shareUrl, 'telegram-share', 'width=800,height=600');
+        break;
+
+      default:
+        return;
+    }
+
+    setShowShareOptions(false);
   };
 
   const showNotificationMessage = (message: string) => {
@@ -203,6 +286,7 @@ const ProductDetails: React.FC = () => {
           <span>{notificationMessage}</span>
         </div>
       )}
+ 
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <Breadcrumb productName={currentProduct.name} />
@@ -218,7 +302,7 @@ const ProductDetails: React.FC = () => {
             <ProductHeader product={currentProduct} />
             <PriceDisplay product={currentProduct} />
 
-            {/* Color Selector - Added directly here */}
+            {/* Color Selector */}
             {currentProduct.colors && currentProduct.colors.length > 0 && (
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
@@ -277,10 +361,10 @@ const ProductDetails: React.FC = () => {
               </div>
 
               <button
-                onClick={handleShare}
+                onClick={() => handleShare()}
                 className="w-full border-2 border-gray-300 text-gray-700 py-3 px-6 rounded-xl font-semibold transition-all duration-300 hover:border-blue-500 hover:text-blue-600 flex items-center justify-center gap-3"
               >
-                <Copy className="w-4 h-4" />
+                <Share2 className="w-4 h-4" />
                 Share Product
               </button>
 
