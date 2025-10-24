@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import axios from 'axios';
-import { Copy, ShoppingCart, Zap, Share2 } from 'lucide-react';
+import { Copy, ShoppingCart, Zap, Share2, Facebook, MessageCircle, Twitter, Send } from 'lucide-react';
 import { Product } from '@/types/product';
 import Breadcrumb from '@/components/ProductDetails/Breadcrumb';
 import ProductImageGallery from '@/components/ProductDetails/ProductImageGallery';
@@ -11,7 +11,6 @@ import PriceDisplay from '@/components/ProductDetails/PriceDisplay';
 import QuantitySelector from '@/components/ProductDetails/QuantitySelector';
 import ServiceFeatures from '@/components/ProductDetails/ServiceFeatures';
 import ProductDescription from '@/components/ProductDetails/ProductDescription';
-import ProductCard from '@/components/ProductCard/ProductCard';
 
 interface CartItem {
   product: Product;
@@ -35,7 +34,7 @@ const ProductDetails: React.FC = () => {
   const [currentProduct, setCurrentProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
+  const [showShareOptions, setShowShareOptions] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -68,22 +67,6 @@ const ProductDetails: React.FC = () => {
     fetchProduct();
   }, [productId]);
 
-  useEffect(() => {
-    const fetchRelatedProducts = async () => {
-      if (!currentProduct) return;
-
-      try {
-        const response = await axios.get(`https://all-mart-avenue-backend.vercel.app/products?category=${currentProduct.category}&limit=8`);
-        const filteredProducts = response.data.filter((product: Product) => product._id !== currentProduct._id);
-        setRelatedProducts(filteredProducts.slice(0, 4));
-      } catch (error) {
-        console.error('Error fetching related products:', error);
-      }
-    };
-
-    fetchRelatedProducts();
-  }, [currentProduct]);
-
   const handleIncrement = (): void => {
     if (currentProduct && quantity < currentProduct.stock) {
       setQuantity(quantity + 1);
@@ -101,6 +84,7 @@ const ProductDetails: React.FC = () => {
 
     const productUrl = `${window.location.origin}/product/${currentProduct._id}`;
 
+    // Check if Web Share API is supported (mobile devices)
     if (navigator.share) {
       try {
         await navigator.share({
@@ -108,15 +92,18 @@ const ProductDetails: React.FC = () => {
           text: `Check out ${currentProduct.name} on AllMart Avenue!`,
           url: productUrl,
         });
+        setShowShareOptions(false);
         return;
       } catch (error) {
         console.log('Web Share API failed, falling back to clipboard');
       }
     }
 
+    // Fallback to clipboard for desktop
     try {
       await navigator.clipboard.writeText(productUrl);
       showNotificationMessage('Product link copied to clipboard!');
+      setShowShareOptions(false);
     } catch {
       const textArea = document.createElement('textarea');
       textArea.value = productUrl;
@@ -125,7 +112,71 @@ const ProductDetails: React.FC = () => {
       document.execCommand('copy');
       document.body.removeChild(textArea);
       showNotificationMessage('Product link copied to clipboard!');
+      setShowShareOptions(false);
     }
+  };
+
+  const handleSocialShare = (platform: string): void => {
+    if (!currentProduct) return;
+
+    const productUrl = `${window.location.origin}/product/${currentProduct._id}`;
+    const shareText = `Check out ${currentProduct.name} on AllMart Avenue! ${productUrl}`;
+    const encodedUrl = encodeURIComponent(productUrl);
+    const encodedText = encodeURIComponent(`Check out ${currentProduct.name} on AllMart Avenue!`);
+
+    let shareUrl = '';
+
+    switch (platform) {
+      case 'facebook':
+        // Facebook Share Dialog
+        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}&quote=${encodedText}`;
+        window.open(shareUrl, 'facebook-share-dialog', 'width=800,height=600');
+        break;
+
+      case 'whatsapp':
+        // WhatsApp - works on both mobile and desktop
+        if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+          // Mobile - will open WhatsApp app directly
+          shareUrl = `whatsapp://send?text=${encodeURIComponent(shareText)}`;
+          window.location.href = shareUrl;
+        } else {
+          // Desktop - open web.whatsapp.com
+          shareUrl = `https://web.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
+          window.open(shareUrl, '_blank', 'width=800,height=600');
+        }
+        break;
+
+      case 'messenger':
+        // Facebook Messenger
+        if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+          // Mobile - try to open Messenger app
+          shareUrl = `fb-messenger://share?link=${encodedUrl}`;
+          window.location.href = shareUrl;
+        } else {
+          // Desktop - open messenger.com
+          shareUrl = `https://www.messenger.com/new`;
+          window.open(shareUrl, '_blank', 'width=800,height=600');
+          // Note: Messenger desktop doesn't support pre-filled messages for security reasons
+        }
+        break;
+
+      case 'twitter':
+        // Twitter
+        shareUrl = `https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedUrl}`;
+        window.open(shareUrl, 'twitter-share', 'width=800,height=400');
+        break;
+
+      case 'telegram':
+        // Telegram
+        shareUrl = `https://t.me/share/url?url=${encodedUrl}&text=${encodedText}`;
+        window.open(shareUrl, 'telegram-share', 'width=800,height=600');
+        break;
+
+      default:
+        return;
+    }
+
+    setShowShareOptions(false);
   };
 
   const showNotificationMessage = (message: string) => {
@@ -236,6 +287,7 @@ const ProductDetails: React.FC = () => {
         </div>
       )}
 
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <Breadcrumb productName={currentProduct.name} />
 
@@ -250,6 +302,7 @@ const ProductDetails: React.FC = () => {
             <ProductHeader product={currentProduct} />
             <PriceDisplay product={currentProduct} />
 
+            {/* Color Selector */}
             {currentProduct.colors && currentProduct.colors.length > 0 && (
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
@@ -339,21 +392,6 @@ const ProductDetails: React.FC = () => {
         <div className="mt-16">
           <ProductDescription product={currentProduct} />
         </div>
-
-        {relatedProducts.length > 0 && (
-          <div className="mt-16">
-            <h2 className="text-2xl font-bold text-gray-900 mb-8">Related Products</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {relatedProducts.map((product, index) => (
-                <ProductCard
-                  key={product._id}
-                  product={product}
-                  index={index}
-                />
-              ))}
-            </div>
-          </div>
-        )}
       </div>
 
       <style jsx>{`
