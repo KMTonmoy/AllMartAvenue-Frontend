@@ -2,6 +2,7 @@
 import { usePathname } from 'next/navigation';
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import AnalyticsTracker from '@/components/AnalyticsTracker/AnalyticsTracker';
 
 export default function DashboardLayoutWrapper({
   children
@@ -18,6 +19,8 @@ export default function DashboardLayoutWrapper({
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
+      <AnalyticsTracker />
+
       <main className="flex-1">{children}</main>
       <Footer />
     </div>

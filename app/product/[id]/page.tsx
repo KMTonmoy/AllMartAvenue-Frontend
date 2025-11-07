@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import axios from 'axios';
-import { Copy, ShoppingCart, Zap, Share2, Facebook, MessageCircle, Twitter, Send } from 'lucide-react';
+import { Copy, ShoppingCart, Zap, Share2 } from 'lucide-react';
 import { Product } from '@/types/product';
 import Breadcrumb from '@/components/ProductDetails/Breadcrumb';
 import ProductImageGallery from '@/components/ProductDetails/ProductImageGallery';
@@ -35,7 +35,7 @@ const ProductDetails: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [showShareOptions, setShowShareOptions] = useState<boolean>(false);
-
+console.log(showShareOptions)
   useEffect(() => {
     const fetchProduct = async () => {
       if (!productId) {
@@ -116,68 +116,68 @@ const ProductDetails: React.FC = () => {
     }
   };
 
-  const handleSocialShare = (platform: string): void => {
-    if (!currentProduct) return;
+  // const handleSocialShare = (platform: string): void => {
+  //   if (!currentProduct) return;
 
-    const productUrl = `${window.location.origin}/product/${currentProduct._id}`;
-    const shareText = `Check out ${currentProduct.name} on AllMart Avenue! ${productUrl}`;
-    const encodedUrl = encodeURIComponent(productUrl);
-    const encodedText = encodeURIComponent(`Check out ${currentProduct.name} on AllMart Avenue!`);
+  //   const productUrl = `${window.location.origin}/product/${currentProduct._id}`;
+  //   const shareText = `Check out ${currentProduct.name} on AllMart Avenue! ${productUrl}`;
+  //   const encodedUrl = encodeURIComponent(productUrl);
+  //   const encodedText = encodeURIComponent(`Check out ${currentProduct.name} on AllMart Avenue!`);
 
-    let shareUrl = '';
+  //   let shareUrl = '';
 
-    switch (platform) {
-      case 'facebook':
-        // Facebook Share Dialog
-        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}&quote=${encodedText}`;
-        window.open(shareUrl, 'facebook-share-dialog', 'width=800,height=600');
-        break;
+  //   switch (platform) {
+  //     case 'facebook':
+  //       // Facebook Share Dialog
+  //       shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}&quote=${encodedText}`;
+  //       window.open(shareUrl, 'facebook-share-dialog', 'width=800,height=600');
+  //       break;
 
-      case 'whatsapp':
-        // WhatsApp - works on both mobile and desktop
-        if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-          // Mobile - will open WhatsApp app directly
-          shareUrl = `whatsapp://send?text=${encodeURIComponent(shareText)}`;
-          window.location.href = shareUrl;
-        } else {
-          // Desktop - open web.whatsapp.com
-          shareUrl = `https://web.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
-          window.open(shareUrl, '_blank', 'width=800,height=600');
-        }
-        break;
+  //     case 'whatsapp':
+  //       // WhatsApp - works on both mobile and desktop
+  //       if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+  //         // Mobile - will open WhatsApp app directly
+  //         shareUrl = `whatsapp://send?text=${encodeURIComponent(shareText)}`;
+  //         window.location.href = shareUrl;
+  //       } else {
+  //         // Desktop - open web.whatsapp.com
+  //         shareUrl = `https://web.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
+  //         window.open(shareUrl, '_blank', 'width=800,height=600');
+  //       }
+  //       break;
 
-      case 'messenger':
-        // Facebook Messenger
-        if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-          // Mobile - try to open Messenger app
-          shareUrl = `fb-messenger://share?link=${encodedUrl}`;
-          window.location.href = shareUrl;
-        } else {
-          // Desktop - open messenger.com
-          shareUrl = `https://www.messenger.com/new`;
-          window.open(shareUrl, '_blank', 'width=800,height=600');
-          // Note: Messenger desktop doesn't support pre-filled messages for security reasons
-        }
-        break;
+  //     case 'messenger':
+  //       // Facebook Messenger
+  //       if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+  //         // Mobile - try to open Messenger app
+  //         shareUrl = `fb-messenger://share?link=${encodedUrl}`;
+  //         window.location.href = shareUrl;
+  //       } else {
+  //         // Desktop - open messenger.com
+  //         shareUrl = `https://www.messenger.com/new`;
+  //         window.open(shareUrl, '_blank', 'width=800,height=600');
+  //         // Note: Messenger desktop doesn't support pre-filled messages for security reasons
+  //       }
+  //       break;
 
-      case 'twitter':
-        // Twitter
-        shareUrl = `https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedUrl}`;
-        window.open(shareUrl, 'twitter-share', 'width=800,height=400');
-        break;
+  //     case 'twitter':
+  //       // Twitter
+  //       shareUrl = `https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedUrl}`;
+  //       window.open(shareUrl, 'twitter-share', 'width=800,height=400');
+  //       break;
 
-      case 'telegram':
-        // Telegram
-        shareUrl = `https://t.me/share/url?url=${encodedUrl}&text=${encodedText}`;
-        window.open(shareUrl, 'telegram-share', 'width=800,height=600');
-        break;
+  //     case 'telegram':
+  //       // Telegram
+  //       shareUrl = `https://t.me/share/url?url=${encodedUrl}&text=${encodedText}`;
+  //       window.open(shareUrl, 'telegram-share', 'width=800,height=600');
+  //       break;
 
-      default:
-        return;
-    }
+  //     default:
+  //       return;
+  //   }
 
-    setShowShareOptions(false);
-  };
+  //   setShowShareOptions(false);
+  // };
 
   const showNotificationMessage = (message: string) => {
     setNotificationMessage(message);
